@@ -1,0 +1,62 @@
+@import 'tailwindcss';
+@plugin 'daisyui';
+@plugin "daisyui/theme" {
+  name: 'pokemon';
+  default: true;
+  prefersdark: true;
+  color-scheme: light;
+
+  --color-base-100: oklch(98% 0.02 240);
+  --color-base-200: oklch(95% 0.03 240);
+  --color-base-300: oklch(92% 0.04 240);
+  --color-base-content: oklch(20% 0.05 240);
+
+  --color-primary: oklch(55% 0.3 240); /* blu Pokémon */
+  --color-primary-content: oklch(98% 0.01 240);
+
+  --color-secondary: oklch(75% 0.2 80); /* giallo Pokémon */
+  --color-secondary-content: oklch(20% 0.05 80);
+
+  --color-accent: oklch(65% 0.25 200); /* azzurro Cristallo */
+  --color-accent-content: oklch(98% 0.01 200);
+
+  --color-neutral: oklch(0.8933 0.0247 250.94);
+  --color-neutral-content: oklch(20% 0.01 80);
+
+  --color-info: oklch(70% 0.2 220);
+  --color-info-content: oklch(98% 0.01 220);
+
+  --color-success: oklch(65% 0.25 140); /* verde Foglia */
+  --color-success-content: oklch(98% 0.01 140);
+
+  --color-warning: oklch(0.7107 0.2195 37.06);
+  --color-warning-content: oklch(98% 0.01 30);
+
+  --color-error: oklch(65% 0.3 30); /* rosso Fuoco */
+  --color-error-content: oklch(98% 0.01 30);
+}
+
+/* Font globali */
+body {
+  font-family: 'Manrope', sans-serif;
+}
+
+h1,
+h2,
+h3,
+.card-title,
+.title,
+.font-heading {
+  font-family: 'Patrick Hand', sans-serif;
+}
+
+/* Opzionale: rendi i titoli più bold o con peso specifico */
+h1,
+.card-title {
+  font-weight: 400; /* Jersey 15 ha solo un peso, ma puoi forzare */
+}
+
+/* Assicura contrasto e leggibilità */
+body {
+  @apply antialiased;
+}

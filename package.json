@@ -14,11 +14,15 @@
     "lint:eslint": "eslint . --fix --cache",
     "format": "prettier --write --experimental-cli src/",
     "test": "jest",
-    "build:css": "npx @tailwindcss/cli -i src/app.css -o public/app.css"
+    "build:css": "npx @tailwindcss/cli -i src/assets/app.css -o public/app.css",
+    "watch:css": "npx @tailwindcss/cli -i src/assets/app.css -o public/app.css --watch"
   },
   "dependencies": {
-    "@tailwindcss/cli": "^4.2.2",
+    "@tailwindcss/vite": "^4.2.2",
+    "axios": "^1.13.6",
+    "lucide-vue-next": "^0.577.0",
     "pinia": "^3.0.4",
+    "tailwindcss": "^4.2.2",
     "ts-node": "^10.9.2",
     "vue": "^3.5.29",
     "vue-router": "^5.0.3"
@@ -31,7 +35,7 @@
     "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.8.1",
     "@vue/vue3-jest": "^29.2.6",
-    "autoprefixer": "^10.4.27",
+    "autoprefixer": "^10.4.20",
     "babel-jest": "^29.7.0",
     "daisyui": "^5.5.19",
     "eslint": "^10.0.2",
@@ -43,9 +47,7 @@
     "jiti": "^2.6.1",
     "npm-run-all2": "^8.0.4",
     "oxlint": "~1.50.0",
-    "postcss": "^8.5.8",
     "prettier": "3.8.1",
-    "tailwindcss": "^4.2.2",
     "ts-jest": "^29.4.6",
     "typescript": "~5.9.3",
     "vite": "^7.3.1",
