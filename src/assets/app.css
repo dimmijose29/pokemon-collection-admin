@@ -1,3 +1,6 @@
+@import './custom.css';
+@source "/formkit.theme.ts";
+@source "/formkit.config.ts";
 @import 'tailwindcss';
 @plugin 'daisyui';
 @plugin "daisyui/theme" {
@@ -47,13 +50,13 @@ h3,
 .card-title,
 .title,
 .font-heading {
-  font-family: 'Patrick Hand', sans-serif;
+  font-family: 'Lexend', sans-serif;
 }
 
 /* Opzionale: rendi i titoli più bold o con peso specifico */
 h1,
 .card-title {
-  font-weight: 400; /* Jersey 15 ha solo un peso, ma puoi forzare */
+  font-weight: 400; /* Lexend ha solo un peso, ma puoi forzare */
 }
 
 /* Assicura contrasto e leggibilità */

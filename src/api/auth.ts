@@ -1,14 +1,14 @@
-// src/api/auth.ts
 import axios from 'axios'
+import type { LoginCredentials, LoginResponse, LoginSuccessResponse } from '@/types/auth'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json',
   },
 })
-console.log('API URL:', import.meta.env.VITE_API_URL)
-// Interceptor per aggiungere token (opzionale ora, lo attiviamo dopo)
+
+// Interceptor per token (opzionale, ma utile)
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -17,24 +17,43 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Funzione login
-export const login = async (payload: { login: string; password: string; code?: string }) => {
-  return api.post('/auth/login', payload)
+// Interceptor errori (opzionale, ma utile per gestire 401 globalmente)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token')
+      // Qui potresti fare logout automatico, ma per ora lasciamo
+    }
+    return Promise.reject(error)
+  },
+)
+
+export const login = async (credentials: LoginCredentials): Promise<LoginResponse> => {
+  const response = await api.post('/auth/login', credentials)
+  return response.data
 }
 
-// Placeholder per logout e 2FA (da implementare)
-export const logout = async () => {
-  return api.post('/auth/logout')
+export const verify2FA = async (code: string): Promise<LoginSuccessResponse> => {
+  const response = await api.post('/auth/2fa/verify', { code })
+  return response.data
 }
 
 export const enable2FA = async () => {
-  return api.post('/auth/2fa/enable')
+  const response = await api.post('/auth/2fa/enable')
+  return response.data
 }
 
 export const confirm2FA = async (code: string) => {
-  return api.post('/auth/2fa/confirm', { code })
+  const response = await api.post('/auth/2fa/confirm', { code })
+  return response.data
 }
 
-export const disable2FA = async (code: string) => {
-  return api.post('/auth/2fa/disable', { code })
+export const disable2FA = async () => {
+  const response = await api.post('/auth/2fa/disable')
+  return response.data
+}
+
+export const logout = async () => {
+  await api.post('/auth/logout')
 }

@@ -2,6 +2,10 @@
 import { ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
+import type { LoginCredentials } from '@/types/auth'
+import ErrorAlert from '@/components/utils/ErrorAlert.vue'
+import { KeyRound, User } from 'lucide-vue-next'
+import Pokemon3DCard from '@/components/utils/Pokemon3DCard.vue'
 
 const auth = useAuth()
 const router = useRouter()
@@ -17,10 +21,9 @@ const twoFactorRequired = ref(false)
 const loading = ref(false)
 
 async function handleSubmit() {
-  error.value = ''
   loading.value = true
 
-  const payload: any = {
+  const payload: LoginCredentials = {
     login: form.value.login.trim(),
     password: form.value.password,
   }
@@ -29,121 +32,123 @@ async function handleSubmit() {
     payload.code = form.value.code.trim()
   }
 
-  try {
-    const res = await auth.login_check(payload)
+  const res = await auth.attemptLogin(payload)
 
-    if (res.twoFactorRequired) {
-      twoFactorRequired.value = true
-      loading.value = false
-      return
-    }
-
-    // Login ok → redirect admin
-    router.push('/admin')
-  } catch (err: any) {
-    error.value = err.response?.data?.message || 'Errore durante il login'
+  if (!res.success) {
+    error.value = res.error || 'Errore sconosciuto'
     loading.value = false
+    return
   }
+  if (res.twoFactorRequired) {
+    twoFactorRequired.value = true
+    loading.value = false
+    return
+  }
+  // router.push('/admin')
+  loading.value = false
+  return
+  // Login ok → redirect adminading.value = false
 }
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-base-200 px-4 py-12">
-    <div class="card w-full max-w-lg bg-base-100 shadow-2xl">
-      <div class="card-body p-8 md:p-10">
-        <button class="btn btn-primary">Primary (blu)</button>
-        <button class="btn btn-secondary">Secondary (giallo)</button>
-        <button class="btn btn-accent">Accent (azzurro Cristallo)</button>
-        <button class="btn btn-success">Success (verde Foglia)</button>
-        <button class="btn btn-error">Error (rosso Fuoco)</button>
-        <button class="btn btn-warning">Warning (arancione)</button>
-        <button class="btn btn-neutral">Neutral (grigio)</button>
-        <button class="btn btn-info">Info (blu)</button>
-        <h1 class="text-5xl font-heading text-theme-color">Titolo Giallo</h1>
-        <p class="font-body text-lg">Testo Manrope</p>
+  <div class="hero min-h-screen bg-base-200 px-4 py-12">
+    <div class="hero-content max-w-full">
+      <div class="grid md:grid-cols-12 gap-12">
+        <div v-motion-slide-left class="md:col-start-1 md:col-end-5">
+          <div class="card rounded-box grid grow place-items-center min-h-full">
+            <div class="card w-full max-w-lg bg-base-100 shadow-2xl">
+              <div class="card-body p-8 md:p-10">
+                <!-- Titolo grande con font-heading -->
+                <img src="/img/logo.png" alt="Logo" class="w-75 mx-auto mb-6" />
 
-        <!-- Titolo grande con font-heading -->
-        <h2 class="card-title text-5xl font-heading text-primary justify-center mb-8 tracking-wide">
-          Login Admin
-        </h2>
+                <!-- Errore con alert DaisyUI -->
+                <ErrorAlert :errors="error ? [error] : []" />
 
-        <!-- Errore con alert DaisyUI -->
-        <div v-if="error" class="alert alert-error shadow-lg mb-6">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span class="font-body">{{ error }}</span>
-        </div>
+                <!-- {{ randomCard.name }} -->
 
-        <form @submit.prevent="handleSubmit">
-          <!-- Campo login unico -->
-          <div class="form-control mb-6">
-            <label class="label">
-              <span class="label-text font-body text-lg">Email o Username</span>
-            </label>
-            <input
-              v-model="form.login"
-              type="text"
-              placeholder="Username o Email"
-              class="input input-bordered input-lg w-full font-body"
-              required
-              autofocus
-            />
-          </div>
+                <FormKit
+                  type="form"
+                  @submit.prevent="handleSubmit"
+                  submit-label="Accedi"
+                  :submit-attrs="{ style: { display: 'none' } }"
+                >
+                  <!-- Campo login unico -->
+                  <div class="mb-8">
+                    <FormKit
+                      type="text"
+                      name="login"
+                      prefix-icon="avatarMan"
+                      value=""
+                      placeholder="Inserire la username o l'email"
+                      input-class="outline-0"
+                      v-model="form.login"
+                      :validation="'required'"
+                      validation-visibility="dirty"
+                      :validation-messages="{
+                        required: 'E\' obbligatorio inserire la password o la username',
+                      }"
+                      message-class="text-error font-bold text-sm mt-1"
+                    />
+                  </div>
 
-          <!-- Password -->
-          <div class="form-control mb-8">
-            <label class="label">
-              <span class="label-text font-body text-lg">Password</span>
-            </label>
-            <input
-              v-model="form.password"
-              type="password"
-              placeholder="••••••••"
-              class="input input-bordered input-lg w-full font-body"
-              required
-            />
-          </div>
+                  <!-- Password -->
+                  <div class="mb-8">
+                    <FormKit
+                      type="password"
+                      name="password"
+                      suffix-icon="password"
+                      value=""
+                      placeholder="Inserire la password"
+                      input-class="outline-0"
+                      v-model="form.password"
+                      :validation="'required'"
+                      validation-visibility="dirty"
+                      :validation-messages="{
+                        required: 'E\' obbligatorio inserire la password',
+                      }"
+                      message-class="text-error font-bold text-sm mt-1"
+                    />
+                  </div>
 
-          <!-- 2FA condizionale con transizione -->
-          <transition name="fade">
-            <div v-if="twoFactorRequired" class="form-control mb-8">
-              <label class="label">
-                <span class="label-text font-body text-lg">Codice 2FA (6 cifre)</span>
-              </label>
-              <input
-                v-model="form.code"
-                type="text"
-                inputmode="numeric"
-                maxlength="6"
-                placeholder="123456"
-                class="input input-bordered input-lg w-full text-center text-3xl tracking-widest font-mono focus:input-primary"
-                required
-                autofocus
-              />
+                  <!-- 2FA condizionale con transizione -->
+                  <div v-if="twoFactorRequired" v-motion-pop class="mb-8">
+                    <FormKit
+                      type="number"
+                      name="code"
+                      label="Inserire codice 2FA"
+                      value=""
+                      placeholder=""
+                      input-class="outline-0 text-center text-2xl tracking-wide"
+                      v-model="form.code"
+                      :validation="'required|number|length:6,6'"
+                      validation-visibility="dirty"
+                      :validation-messages="{
+                        required: 'E\' obbligatorio inserire il codice',
+                      }"
+                      message-class="text-error font-bold text-sm mt-1"
+                    />
+                  </div>
+
+                  <!-- Bottone -->
+                  <button
+                    type="submit"
+                    class="btn btn-secondary btn-lg w-full text-xl font-heading"
+                    :disabled="loading"
+                  >
+                    <span v-if="loading" class="loading loading-spinner loading-lg"></span>
+                    {{ twoFactorRequired ? 'Verifica Codice' : 'Accedi' }}
+                  </button>
+                </FormKit>
+              </div>
             </div>
-          </transition>
-
-          <!-- Bottone -->
-          <button
-            type="submit"
-            class="btn btn-primary btn-lg w-full text-xl font-heading"
-            :disabled="loading"
-          >
-            <span v-if="loading" class="loading loading-spinner loading-lg"></span>
-            {{ twoFactorRequired ? 'Verifica Codice' : 'Accedi' }}
-          </button>
-        </form>
+          </div>
+        </div>
+        <div class="md:col-start-5 md:col-end-13">
+          <div class="card rounded-box grid grow place-items-center">
+            <Pokemon3DCard :pokemon-image-url="pokemonImageUrl" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -160,5 +165,11 @@ async function handleSubmit() {
 .fade-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+.login-title {
+  /* Colore con sfumatura */
+  -webkit-text-stroke: 10px var(--color-black);
+  paint-order: stroke fill;
 }
 </style>

@@ -1,11 +1,11 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
-  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}', './formkit.theme.ts'],
   theme: {
     extend: {
       fontFamily: {
-        heading: ['Jersey 15', 'sans-serif'],
+        heading: ['Lexend', 'sans-serif'],
         body: ['Manrope', 'sans-serif'],
       },
     },
@@ -19,7 +19,7 @@ const config: Config = {
 
           // Font
           '--font-sans': '"Manrope", system-ui, sans-serif',
-          '--font-heading': '"Jersey 15", sans-serif',
+          '--font-heading': '"Lexend", sans-serif',
 
           // Applica font di default al body
           '--font-family': 'var(--font-sans)',

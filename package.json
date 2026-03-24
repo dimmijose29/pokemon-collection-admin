@@ -18,7 +18,11 @@
     "watch:css": "npx @tailwindcss/cli -i src/assets/app.css -o public/app.css --watch"
   },
   "dependencies": {
+    "@formkit/icons": "^1.7.2",
+    "@formkit/vue": "^1.7.2",
     "@tailwindcss/vite": "^4.2.2",
+    "@tcgdex/sdk": "^2.7.1",
+    "@vueuse/motion": "^3.0.3",
     "axios": "^1.13.6",
     "lucide-vue-next": "^0.577.0",
     "pinia": "^3.0.4",
