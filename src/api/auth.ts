@@ -8,7 +8,7 @@ const api = axios.create({
   },
 })
 
-// Interceptor per token (opzionale, ma utile)
+// Interceptor per token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -17,13 +17,12 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Interceptor errori (opzionale, ma utile per gestire 401 globalmente)
+// Interceptor errori (gestione 401 globale)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
-      // Qui potresti fare logout automatico, ma per ora lasciamo
     }
     return Promise.reject(error)
   },
@@ -51,6 +50,11 @@ export const confirm2FA = async (code: string) => {
 
 export const disable2FA = async () => {
   const response = await api.post('/auth/2fa/disable')
+  return response.data
+}
+
+export const forgotPassword = async (email: string) => {
+  const response = await api.post('/auth/forgot-password', { email })
   return response.data
 }
 

@@ -32,7 +32,7 @@ onBeforeMount(async () => {
     <div class="card-body">
       <div class="grid md:grid-cols-4 gap-4 w-full">
         <div class="md:col-start-1 md:col-end-3">
-          <div class="hover-3d mx-auto w-full mt-6">
+          <div class="hover-3d mx-auto w-full mt-12">
             <!-- content -->
             <figure class="w-75 rounded-2xl mx-auto">
               <img :src="pokemonImageUrl" />

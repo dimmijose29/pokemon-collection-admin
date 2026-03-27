@@ -1,15 +1,13 @@
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useErrorList } from '@/composables/useErrorList'
-import { login, verify2FA } from '@/api/auth'
-import type { AxiosError } from 'axios'
+import { login, verify2FA, logout as apiLogout } from '@/api/auth'
 import type {
   LoginCredentials,
   LoginResponse,
   TwoFactorChallengeResponse,
   LoginSuccessResponse,
 } from '@/types/auth'
-import type { un } from 'vue-router/dist/index-BzEKChPW.js'
 
 export function useAuth() {
   const store = useAuthStore()
@@ -23,10 +21,9 @@ export function useAuth() {
 
     try {
       const res = await login(credentials)
-      console.log('Login response:', res) // debug
 
       if ('twoFactorRequired' in res && res.twoFactorRequired) {
-        return { twoFactorRequired: true }
+        return { success: false, twoFactorRequired: true }
       }
 
       // Login ok (ha token)
@@ -34,15 +31,7 @@ export function useAuth() {
       store.fillUser(res.user)
 
       return { success: true }
-    } catch (err: AxiosError | unknown) {
-      console.error('Login catch:', err) // debug
-
-      let message = 'Errore durante il login'
-
-      if (err instanceof Error) {
-        message = err.message
-      }
-
+    } catch (err: unknown) {
       errorList.setErrors(err)
       return { success: false, error: errorList.allErrors.value }
     } finally {
@@ -57,22 +46,20 @@ export function useAuth() {
     try {
       const res = await verify2FA(code)
 
-      // TypeScript sa che res è LoginSuccessResponse (non ha twoFactorRequired)
       store.setToken(res.token)
       store.fillUser(res.user)
 
       return { success: true }
     } catch (err: unknown) {
-      // Narrowing sicuro
-      if (err instanceof Error) {
-        error.value = err.message || 'Codice 2FA non valido'
-      } else if (
-        typeof err === 'object' &&
+      if (
         err &&
+        typeof err === 'object' &&
         'response' in err &&
-        err.response?.data?.message
+        (err as any).response?.data?.message
       ) {
-        error.value = err.response.data.message
+        error.value = (err as any).response.data.message
+      } else if (err instanceof Error) {
+        error.value = err.message || 'Codice 2FA non valido'
       } else {
         error.value = 'Errore durante la verifica 2FA'
       }
@@ -84,7 +71,7 @@ export function useAuth() {
 
   async function logout() {
     try {
-      await logout()
+      await apiLogout()
     } catch (err: unknown) {
       console.warn('Logout API fallito, procedo localmente')
     }

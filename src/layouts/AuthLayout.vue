@@ -1,26 +1,36 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+defineProps<{
+  twoColumns?: boolean
+}>()
 </script>
 
 <template>
-  <div
-    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-base-200 to-base-300"
-  >
-    <!-- Logo o titolo opzionale in alto -->
-    <div class="absolute top-8 left-1/2 transform -translate-x-1/2">
-      <h1 class="text-4xl font-heading text-primary tracking-wide">Pokémon Collection</h1>
-    </div>
+  <div class="hero min-h-screen bg-base-200 px-4 py-12 overflow-x-hidden">
+    <div class="hero-content max-w-full w-full">
+      <!-- Layout a due colonne -->
+      <div v-if="twoColumns" class="grid md:grid-cols-12 gap-12 w-full">
+        <div v-motion-slide-left class="md:col-start-1 md:col-end-5">
+          <div class="grid place-items-center min-h-full">
+            <div class="w-full max-w-lg">
+              <img src="/img/logo.png" alt="Logo" class="w-75 mx-auto mb-6" />
+              <slot />
+            </div>
+          </div>
+        </div>
+        <div class="md:col-start-5 md:col-end-13">
+          <div class="grid place-items-center">
+            <slot name="sidebar" />
+          </div>
+        </div>
+      </div>
 
-    <!-- Contenuto centrato (la pagina login/2fa/recupero) -->
-    <div class="w-full max-w-lg px-6">
-      <RouterView />
+      <!-- Layout centrato (senza sidebar) -->
+      <div v-else class="flex flex-col items-center w-full">
+        <div v-motion-slide-left class="w-full max-w-lg">
+          <img src="/img/logo.png" alt="Logo" class="w-75 mx-auto mb-6" />
+          <slot />
+        </div>
+      </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Gradiente di sfondo leggero ispirato a Pokémon */
-.bg-gradient-to-br {
-  background: linear-gradient(to bottom right, theme('colors.base-200'), theme('colors.base-300'));
-}
-</style>
