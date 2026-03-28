@@ -1,58 +1,44 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import { useAuthStore } from '@/stores/auth'
+import { me } from '@/api/auth'
+import { authRoutes } from './routes/auth'
+import { dashboardRoutes } from './routes/dashboard'
+import { errorRoutes } from './routes/errors'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/home',
-      name: 'home',
-      component: HomeView,
-    },
-    // Rotte auth
-    {
-      path: '/',
-      name: 'login',
-      component: () => import('@/views/auth/LoginView.vue'),
-      meta: { requiresGuest: true },
-    },
-    {
-      path: '/password-dimenticata',
-      name: 'forgot-password',
-      component: () => import('@/views/auth/ForgotPasswordView.vue'),
-      meta: { requiresGuest: true },
-    },
-    {
-      path: '/about',
-      name: 'about',
-      component: () => import('../views/AboutView.vue'),
-    },
-    {
-      path: '/test',
-      name: 'test',
-      component: () => import('../views/TestView.vue'),
-    },
+    ...authRoutes,
+    ...dashboardRoutes,
+    ...errorRoutes, // catch-all sempre in fondo
   ],
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, _from, next) => {
   const auth = useAuthStore()
 
-  // Rotte che richiedono autenticazione
-  if (to.meta.requiresAuth && !auth.isAuthenticated) {
-    next({ name: 'login' })
+  // Token presente ma utente non ancora in memoria (es. refresh pagina)
+  if (auth.token && !auth.user) {
+    try {
+      auth.fillUser(await me())
+    } catch {
+      auth.clearAuth() // token scaduto o non valido
+    }
   }
-  // Rotte che richiedono admin
-  else if (to.meta.requiresAdmin && !auth.isAdmin) {
-    next({ name: 'login' })
+
+  if ((to.meta.requiresAuth || to.meta.requiresAdmin) && !auth.isAuthenticated) {
+    return next({ name: 'unauthorized' })
   }
-  // Rotte guest (login) → redirect se già autenticato
-  else if (to.meta.requiresGuest && auth.isAuthenticated) {
-    next({ name: 'home' })
-  } else {
-    next()
+
+  if (to.meta.requiresAdmin && !auth.isAdmin) {
+    return next({ name: 'unauthorized' })
   }
+
+  if (to.meta.requiresGuest && auth.isAuthenticated) {
+    return next({ name: 'home' })
+  }
+
+  next()
 })
 
 export default router

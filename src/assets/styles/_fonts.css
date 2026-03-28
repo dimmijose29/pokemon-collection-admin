@@ -1,0 +1,18 @@
+body {
+  font-family: 'Manrope', sans-serif;
+  @apply antialiased;
+}
+
+h1,
+h2,
+h3,
+.card-title,
+.title,
+.font-heading {
+  font-family: 'Lexend', sans-serif;
+}
+
+h1,
+.card-title {
+  font-weight: 400;
+}
