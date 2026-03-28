@@ -10,8 +10,9 @@ export interface LoginSuccessResponse {
 }
 
 export interface TwoFactorChallengeResponse {
-  twoFactorRequired: true
+  two_factor_required: true // snake_case come arriva dall'API
   message: string
+  temp_token: string
 }
 
 export type LoginResponse = LoginSuccessResponse | TwoFactorChallengeResponse
@@ -21,5 +22,4 @@ export interface User {
   email: string
   username?: string
   is_admin: boolean
-  // Aggiungi qui eventuali altri campi che hai nel modello User
 }

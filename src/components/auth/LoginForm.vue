@@ -4,9 +4,14 @@ import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import type { LoginCredentials } from '@/types/auth'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
+import OtpInput from '@/components/auth/OtpInput.vue'
+import { parseErrors } from '@/utils/parseErrors'
+import { useCapsLock } from '@/composables/useCapsLock'
+import { CircleAlert } from 'lucide-vue-next'
 
 const auth = useAuth()
 const router = useRouter()
+const { capsLockOn, checkCapsLock } = useCapsLock()
 
 const form = ref({
   login: '',
@@ -16,37 +21,40 @@ const form = ref({
 
 const errors = ref<string[]>([])
 const twoFactorRequired = ref(false)
+const tempToken = ref('')
 const loading = ref(false)
 
 async function handleSubmit() {
   loading.value = true
   errors.value = []
 
+  // Fase 2: verifica codice OTP
+  if (twoFactorRequired.value) {
+    const res = await auth.verify2FACode(form.value.code, tempToken.value)
+    if (!res.success) errors.value = [res.error || 'Codice 2FA non valido']
+    else router.push({ name: 'home' })
+
+    loading.value = false
+    return
+  }
+
+  // Fase 1: login normale
   const payload: LoginCredentials = {
     login: form.value.login.trim(),
     password: form.value.password,
   }
 
-  if (twoFactorRequired.value) {
-    payload.code = form.value.code.trim()
-  }
-
   const res = await auth.attemptLogin(payload)
 
-  if (!res.success && !res.twoFactorRequired) {
-    if (Array.isArray(res.error)) {
-      errors.value = res.error
-    } else if (res.error) {
-      errors.value = [res.error]
-    } else {
-      errors.value = ['Errore durante il login']
-    }
+  if (res.twoFactorRequired) {
+    twoFactorRequired.value = true
+    tempToken.value = res.tempToken || ''
     loading.value = false
     return
   }
 
-  if (res.twoFactorRequired) {
-    twoFactorRequired.value = true
+  if (!res.success) {
+    errors.value = parseErrors(res.error, 'Errore durante il login')
     loading.value = false
     return
   }
@@ -73,7 +81,7 @@ async function handleSubmit() {
         :submit-attrs="{ style: { display: 'none' } }"
       >
         <!-- Username / Email -->
-        <div class="mb-5">
+        <div v-if="!twoFactorRequired" class="mb-5">
           <FormKit
             type="text"
             name="login"
@@ -84,15 +92,13 @@ async function handleSubmit() {
             v-model="form.login"
             validation="required"
             validation-visibility="dirty"
-            :validation-messages="{
-              required: 'Inserisci username o email',
-            }"
+            :validation-messages="{ required: 'Inserisci username o email' }"
             message-class="text-error text-sm mt-1"
           />
         </div>
 
         <!-- Password -->
-        <div class="mb-5">
+        <div v-if="!twoFactorRequired" class="mb-5">
           <FormKit
             type="password"
             name="password"
@@ -103,35 +109,32 @@ async function handleSubmit() {
             v-model="form.password"
             validation="required"
             validation-visibility="dirty"
-            :validation-messages="{
-              required: 'Inserisci la password',
-            }"
+            :validation-messages="{ required: 'Inserisci la password' }"
             message-class="text-error text-sm mt-1"
+            @click="checkCapsLock"
+            @keydown="checkCapsLock"
           />
+          <div
+            v-if="capsLockOn"
+            v-motion-pop
+            class="flex items-center gap-1 text-warning text-md mt-1"
+          >
+            <CircleAlert class="inline" /><strong> CAPS LOCK attivo</strong>
+          </div>
         </div>
 
         <!-- 2FA (condizionale) -->
         <div v-if="twoFactorRequired" v-motion-pop class="mb-5">
-          <FormKit
-            type="number"
-            name="code"
-            label="Codice 2FA"
-            placeholder="000000"
-            input-class="outline-0 w-full text-center text-2xl tracking-widest"
-            v-model="form.code"
-            validation="required|number|length:6,6"
-            validation-visibility="dirty"
-            :validation-messages="{
-              required: 'Inserisci il codice 2FA',
-            }"
-            message-class="text-error text-sm mt-1"
-          />
+          <label class="block text-sm font-medium text-center mb-3">
+            Inserisci il codice OTP a 6 cifre
+          </label>
+          <OtpInput v-model="form.code" :length="6" @complete="handleSubmit" />
         </div>
 
         <!-- Submit -->
         <button
           type="submit"
-          class="btn btn-secondary w-full text-lg font-heading"
+          class="btn btn-secondary w-full text-lg font-heading mt-2"
           :disabled="loading"
         >
           <span v-if="loading" class="loading loading-spinner loading-sm"></span>
@@ -140,7 +143,7 @@ async function handleSubmit() {
       </FormKit>
 
       <!-- Link recupero password -->
-      <div class="text-center mt-4">
+      <div v-if="!twoFactorRequired" class="text-center mt-4">
         <RouterLink to="/password-dimenticata" class="link link-hover text-sm text-base-content/60">
           Password dimenticata?
         </RouterLink>

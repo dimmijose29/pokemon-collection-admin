@@ -8,7 +8,6 @@ const api = axios.create({
   },
 })
 
-// Interceptor per token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -17,7 +16,6 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Interceptor errori (gestione 401 globale)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -33,8 +31,8 @@ export const login = async (credentials: LoginCredentials): Promise<LoginRespons
   return response.data
 }
 
-export const verify2FA = async (code: string): Promise<LoginSuccessResponse> => {
-  const response = await api.post('/auth/2fa/verify', { code })
+export const verify2FA = async (code: string, tempToken: string): Promise<LoginSuccessResponse> => {
+  const response = await api.post('/auth/2fa/verify', { code, temp_token: tempToken })
   return response.data
 }
 

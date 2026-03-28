@@ -2,12 +2,7 @@ import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useErrorList } from '@/composables/useErrorList'
 import { login, verify2FA, logout as apiLogout } from '@/api/auth'
-import type {
-  LoginCredentials,
-  LoginResponse,
-  TwoFactorChallengeResponse,
-  LoginSuccessResponse,
-} from '@/types/auth'
+import type { LoginCredentials } from '@/types/auth'
 
 export function useAuth() {
   const store = useAuthStore()
@@ -22,14 +17,17 @@ export function useAuth() {
     try {
       const res = await login(credentials)
 
-      if ('twoFactorRequired' in res && res.twoFactorRequired) {
-        return { success: false, twoFactorRequired: true }
+      // Il backend ritorna two_factor_required in snake_case
+      if ('two_factor_required' in res && res.two_factor_required) {
+        return {
+          success: false,
+          twoFactorRequired: true,
+          tempToken: res.temp_token,
+        }
       }
 
-      // Login ok (ha token)
       store.setToken(res.token)
       store.fillUser(res.user)
-
       return { success: true }
     } catch (err: unknown) {
       errorList.setErrors(err)
@@ -39,16 +37,14 @@ export function useAuth() {
     }
   }
 
-  async function confirm2FACode(code: string) {
+  async function verify2FACode(code: string, tempToken: string) {
     loading.value = true
     error.value = ''
 
     try {
-      const res = await verify2FA(code)
-
+      const res = await verify2FA(code, tempToken)
       store.setToken(res.token)
       store.fillUser(res.user)
-
       return { success: true }
     } catch (err: unknown) {
       if (
@@ -63,7 +59,7 @@ export function useAuth() {
       } else {
         error.value = 'Errore durante la verifica 2FA'
       }
-      return { success: false }
+      return { success: false, error: error.value }
     } finally {
       loading.value = false
     }
@@ -80,7 +76,7 @@ export function useAuth() {
 
   return {
     attemptLogin,
-    confirm2FACode,
+    verify2FACode,
     logout,
     loading,
     error,
