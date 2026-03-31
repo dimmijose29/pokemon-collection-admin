@@ -32,7 +32,7 @@ async function handleSubmit() {
   if (twoFactorRequired.value) {
     const res = await auth.verify2FACode(form.value.code, tempToken.value)
     if (!res.success) errors.value = [res.error || 'Codice 2FA non valido']
-    else router.push({ name: 'home' })
+    else router.push({ name: 'dashboard' })
 
     loading.value = false
     return
@@ -60,7 +60,7 @@ async function handleSubmit() {
   }
 
   loading.value = false
-  router.push({ name: 'home' })
+  router.push({ name: 'dashboard' })
 }
 </script>
 

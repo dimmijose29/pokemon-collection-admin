@@ -17,6 +17,8 @@ const router = createRouter({
 router.beforeEach(async (to, _from, next) => {
   const auth = useAuthStore()
 
+  if (to.name === 'login') auth.clearAuth() // Pulisco auth se vado alla pagina di login
+
   // Token presente ma utente non ancora in memoria (es. refresh pagina)
   if (auth.token && !auth.user) {
     try {

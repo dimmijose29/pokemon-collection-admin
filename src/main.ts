@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { MotionPlugin } from '@vueuse/motion'
 import { plugin, defaultConfig } from '@formkit/vue'
+// import { VueQueryPlugin } from '@tanstack/vue-query'
 import config from '../formkit.config.ts'
 
 import App from './App.vue'
