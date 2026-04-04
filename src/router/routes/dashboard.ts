@@ -16,7 +16,7 @@ const adminChildren: RouteRecordRaw[] = adminNavGroups
 export const dashboardRoutes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('@/layouts/admin/AdminLayout.vue'),
+    component: () => import('@/layouts/admin/AdminPage.vue'),
     meta: { requiresAuth: true },
     children: adminChildren,
   },

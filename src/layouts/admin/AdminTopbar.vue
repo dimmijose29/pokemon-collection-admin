@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { Menu, LogOut, Settings, PanelLeft, Rows3 } from 'lucide-vue-next'
 import { useLayoutStore } from '@/stores/layout'
 import { useAuthStore } from '@/stores/auth'
@@ -10,10 +9,6 @@ const layout = useLayoutStore()
 const authStore = useAuthStore()
 const { logout } = useAuth()
 const router = useRouter()
-const route = useRoute()
-
-const pageTitle = computed(() => String(route.meta.title ?? 'Dashboard'))
-const pageIcon = computed(() => route.meta.icon ?? null)
 
 async function handleLogout() {
   await logout()
@@ -22,8 +17,8 @@ async function handleLogout() {
 </script>
 
 <template>
-  <header class="h-16 bg-secondary border-b border-base-300 flex items-center px-4 gap-4 shrink-0">
-    <!-- Hamburger: solo mobile, apre il drawer -->
+  <header class="h-16 bg-secondary border-b border-base-300 flex items-center px-4 gap-2 shrink-0">
+    <!-- Hamburger: solo mobile -->
     <button
       v-if="layout.mode === 'sidebar'"
       @click="layout.toggleMobileSidebar()"
@@ -32,13 +27,7 @@ async function handleLogout() {
       <Menu class="w-5 h-5" />
     </button>
 
-    <!-- Page title con icona -->
-    <div class="flex items-center gap-2 flex-1 min-w-0">
-      <component :is="pageIcon" v-if="pageIcon" class="w-5 h-5 shrink-0 text-base-content/60" />
-      <h1 class="font-heading font-bold md:text-2xl text-base-content truncate">
-        {{ pageTitle }}
-      </h1>
-    </div>
+    <div class="flex-1" />
 
     <!-- Layout mode toggle -->
     <div class="tooltip tooltip-bottom" data-tip="Cambia layout">

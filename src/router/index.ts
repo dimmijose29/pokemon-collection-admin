@@ -16,6 +16,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, _from, next) => {
   const auth = useAuthStore()
+  document.title = to.meta.title ? `${to.meta.title} - Pokemon Collection` : 'Pokemon Collection'
 
   if (to.name === 'login') auth.clearAuth() // Pulisco auth se vado alla pagina di login
 
