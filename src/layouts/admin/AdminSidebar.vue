@@ -51,11 +51,21 @@ async function handleLogout() {
     <!-- Logo -->
     <div class="flex items-center h-16 px-4 border-b border-base-300 shrink-0 overflow-hidden">
       <RouterLink :to="{ name: 'dashboard' }" class="flex items-center gap-3">
+        <!-- Mobile: sempre logo.png (lg:hidden) -->
+        <img src="/img/logo.png" alt="Logo" class="w-22 shrink-0 lg:hidden" />
+        <!-- Desktop espanso: logo.png -->
         <img
-          :src="collapsed ? '/img/pokeball.png' : '/img/logo.png'"
+          v-if="!collapsed"
+          src="/img/logo.png"
           alt="Logo"
-          :class="collapsed ? 'lg:w-8 lg:h-8 w-22' : 'w-22'"
-          class="shrink-0 transition-all duration-300"
+          class="w-22 shrink-0 hidden lg:block"
+        />
+        <!-- Desktop collapsed: pokeball.png -->
+        <img
+          v-if="collapsed"
+          src="/img/pokeball.png"
+          alt="Logo"
+          class="w-8 h-8 shrink-0 hidden lg:block"
         />
       </RouterLink>
     </div>
