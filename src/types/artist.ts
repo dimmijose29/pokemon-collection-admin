@@ -3,6 +3,7 @@ export interface Artist {
   name: string
   created_at: string
   updated_at: string
+  deleted_at?: string | null
 }
 
 // Laravel Resource Collection: { data: [], meta: { total, last_page, ... } }

@@ -3,12 +3,14 @@ import { useAuthStore } from '@/stores/auth'
 import { useErrorList } from '@/composables/useErrorList'
 import { login, verify2FA, logout as apiLogout } from '@/api/auth'
 import type { LoginCredentials } from '@/types/auth'
+import { useQueryClient } from '@tanstack/vue-query'
 
 export function useAuth() {
   const store = useAuthStore()
   const errorList = useErrorList()
   const loading = ref(false)
   const error = ref<string>('')
+  const queryClient = useQueryClient()
 
   async function attemptLogin(credentials: LoginCredentials) {
     loading.value = true
@@ -28,6 +30,7 @@ export function useAuth() {
 
       store.setToken(res.token)
       store.fillUser(res.user)
+      queryClient.clear()
       return { success: true }
     } catch (err: unknown) {
       errorList.setErrors(err)
@@ -45,6 +48,7 @@ export function useAuth() {
       const res = await verify2FA(code, tempToken)
       store.setToken(res.token)
       store.fillUser(res.user)
+      queryClient.clear()
       return { success: true }
     } catch (err: unknown) {
       if (

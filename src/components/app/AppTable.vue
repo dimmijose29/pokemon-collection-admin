@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { Search, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { RefreshCw, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
 const props = defineProps<{
   searchPlaceholder?: string
   total?: number
   loading?: boolean
+  refreshing?: boolean
   currentPage?: number
   totalPages?: number
 }>()
@@ -12,6 +13,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:search': [value: string]
   'update:currentPage': [page: number]
+  refresh: []
 }>()
 
 const search = defineModel<string>('search', { default: '' })
@@ -21,24 +23,36 @@ const search = defineModel<string>('search', { default: '' })
   <div class="card bg-base-100 shadow-sm border border-base-300 overflow-hidden">
     <!-- Toolbar -->
     <div class="flex flex-wrap items-center gap-3 px-4 py-3 border-b border-base-300">
-      <div class="mt-2 w-full">
-        <FormKit
-          type="text"
-          prefix-icon="search"
-          outer-class="max-w-full"
-          input-class="outline-0"
-          v-model="search"
-          :placeholder="searchPlaceholder ?? 'Cerca...'"
-        />
+      <!-- Riga ricerca + refresh -->
+      <div class="flex items-center gap-2 w-full">
+        <div class="flex-1">
+          <FormKit
+            type="text"
+            prefix-icon="search"
+            outer-class="!mb-0 max-w-full"
+            input-class="outline-0"
+            v-model="search"
+            :placeholder="searchPlaceholder ?? 'Cerca...'"
+          />
+        </div>
+
+        <button
+          class="btn btn-ghost btn-sm bg-gray-200 hover:bg-gray-100 gap-2"
+          :disabled="refreshing"
+          @click="emit('refresh')"
+        >
+          <RefreshCw class="w-4 h-4" :class="refreshing ? 'animate-spin' : ''" />
+          <span class="hidden sm:inline">Aggiorna</span>
+        </button>
       </div>
 
-      <!-- Slot per filtri aggiuntivi specifici della sezione -->
+      <!-- Filtri aggiuntivi (opzionali) -->
       <slot name="filters" />
 
       <div class="flex-1" />
 
       <span v-if="total !== undefined" class="text-sm text-base-content/50">
-        {{ total }} risultati
+        {{ total }} {{ total === 1 ? 'risultato' : 'risultati' }}
       </span>
     </div>
 

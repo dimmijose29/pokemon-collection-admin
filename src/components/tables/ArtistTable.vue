@@ -1,47 +1,74 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
-import { Table, Pencil, Trash2 } from 'lucide-vue-next'
+import { Table } from 'lucide-vue-next'
 import AppTable from '@/components/app/AppTable.vue'
-import { getArtists, deleteArtist } from '@/api/artists'
-import { useDebounce } from '@/composables/useDebounce'
+import ActionColumn from '@/components/shared/ActionColumn.vue'
+import StatusFilter from '@/components/shared/StatusFilter.vue'
+import type { StatusFilterValue } from '@/components/shared/StatusFilter.vue'
 import { formatDate } from '@/utils/dates'
+import { filterBySearch } from '@/utils/search'
+import { useModalStore } from '@/stores/modal'
+import Artists from '@/api/artists'
 
+const modalStore = useModalStore()
 const queryClient = useQueryClient()
 const search = ref('')
-const debouncedSearch = useDebounce(search, 400)
+const statusFilter = ref<StatusFilterValue>('active')
 
-// Reset pagina quando cambia la ricerca debouncata
-watch(debouncedSearch, () => {
-  page.value = 1
-})
-
-const page = ref(1)
-
-const { data, isLoading } = useQuery({
-  // La queryKey usa debouncedSearch: la fetch parte solo dopo 400ms di pausa
-  queryKey: computed(() => ['artists', { search: debouncedSearch.value }]),
-  queryFn: () => getArtists({ search: debouncedSearch.value }),
+const { data, isLoading, isFetching, refetch } = useQuery({
+  queryKey: ['artists'],
+  queryFn: () => Artists.get({ withTrashed: true }),
+  staleTime: Infinity,
   placeholderData: (prev) => prev,
-  staleTime: 1000 * 60 * 5, // dati freschi per 5 minuti
 })
 
-// La risposta è un array piatto
-const artists = computed(() => data.value ?? [])
+const allArtists = computed(() => data.value ?? [])
+
+const artists = computed(() => {
+  let filtered = allArtists.value
+
+  if (statusFilter.value === 'active') {
+    filtered = filtered.filter((a) => !a.deleted_at)
+  } else if (statusFilter.value === 'deleted') {
+    filtered = filtered.filter((a) => !!a.deleted_at)
+  }
+
+  return filterBySearch(filtered, search.value, {
+    excludeKeys: ['updated_at', 'deleted_at'],
+    transformers: {
+      created_at: (v) => formatDate(v as string),
+    },
+  })
+})
+
 const total = computed(() => artists.value.length)
 
+// mutations
 const { mutate: remove } = useMutation({
-  mutationFn: deleteArtist,
+  mutationFn: (id: number) => Artists.remove(id),
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['artists'] }),
+})
+
+const { mutate: restore } = useMutation({
+  mutationFn: (id: number) => Artists.restore(id),
   onSuccess: () => queryClient.invalidateQueries({ queryKey: ['artists'] }),
 })
 </script>
+
 <template>
   <AppTable
     v-model:search="search"
-    search-placeholder="Cerca artista..."
+    search-placeholder="Cerca..."
     :total="total"
-    :loading="isLoading"
+    :loading="isLoading || isFetching"
+    :refreshing="isFetching"
+    @refresh="refetch()"
   >
+    <template #filters>
+      <StatusFilter v-model="statusFilter" />
+    </template>
+
     <template #head>
       <tr>
         <th>Nome</th>
@@ -55,23 +82,12 @@ const { mutate: remove } = useMutation({
         <td class="font-medium">{{ artist.name }}</td>
         <td class="text-base-content/60 text-sm">{{ formatDate(artist.created_at) }}</td>
         <td>
-          <div class="flex items-center gap-1">
-            <button
-              class="btn btn-ghost btn-xs btn-square text-success tooltip tooltip-success"
-              data-tip="Modifica"
-              title="Modifica"
-            >
-              <Pencil class="w-3.5 h-3.5" />
-            </button>
-            <button
-              class="btn btn-ghost btn-xs btn-square text-error tooltip tooltip-error"
-              data-tip="Elimina"
-              title="Elimina"
-              @click="remove(artist.id)"
-            >
-              <Trash2 class="w-3.5 h-3.5" />
-            </button>
-          </div>
+          <ActionColumn
+            :actions="artist.deleted_at ? ['restore'] : ['edit', 'delete']"
+            @edit="modalStore.open(artist as Record<string, unknown>)"
+            @delete="remove(artist.id)"
+            @restore="restore(artist.id)"
+          />
         </td>
       </tr>
     </template>
