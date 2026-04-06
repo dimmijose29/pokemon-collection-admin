@@ -17,7 +17,7 @@ const options: { value: StatusFilterValue; label: string; component?: any }[] = 
       v-for="opt in options"
       :key="opt.value"
       class="join-item btn btn-sm"
-      :class="model === opt.value ? 'btn-secondary' : 'btn-ghost bg-gray-200 hover:bg-gray-100'"
+      :class="model === opt.value ? 'btn-secondary' : 'btn-default'"
       @click="model = opt.value"
     >
       <component v-if="opt.component" :is="opt.component" class="w-3.5 h-3.5 mr-1" />

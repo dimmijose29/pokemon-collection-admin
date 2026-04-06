@@ -31,7 +31,7 @@ onBeforeMount(async () => {
   <div v-motion-slide-right v-if="randomCard" class="card card-side bg-base-100 shadow-s w-full">
     <div class="card-body" :submit-attrs="{ style: { height: '75vh' } }">
       <div class="grid md:grid-cols-4 gap-4 w-full">
-        <div class="md:col-start-1 md:col-end-3">
+        <div v-if="pokemonImageUrl" v-motion-pop class="md:col-start-1 md:col-end-3">
           <div class="hover-3d mx-auto w-full mt-12">
             <!-- content -->
             <figure class="w-75 rounded-2xl mx-auto">

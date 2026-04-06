@@ -36,11 +36,7 @@ const search = defineModel<string>('search', { default: '' })
           />
         </div>
 
-        <button
-          class="btn btn-ghost btn-sm bg-gray-200 hover:bg-gray-100 gap-2"
-          :disabled="refreshing"
-          @click="emit('refresh')"
-        >
+        <button class="btn btn-sm btn-soft gap-2" :disabled="refreshing" @click="emit('refresh')">
           <RefreshCw class="w-4 h-4" :class="refreshing ? 'animate-spin' : ''" />
           <span class="hidden sm:inline">Aggiorna</span>
         </button>

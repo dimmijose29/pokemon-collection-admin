@@ -8,7 +8,6 @@
 @plugin "daisyui/theme" {
   name: 'pokemon';
   default: true;
-  prefersdark: true;
   color-scheme: light;
 
   --color-base-100: oklch(98% 0.02 240);
@@ -38,5 +37,39 @@
   --color-warning-content: oklch(98% 0.01 30);
 
   --color-error: oklch(65% 0.3 30);
+  --color-error-content: oklch(98% 0.01 30);
+}
+
+@plugin "daisyui/theme" {
+  name: 'pokemon-dark';
+  color-scheme: dark;
+
+  --color-base-100: oklch(16% 0.03 240);
+  --color-base-200: oklch(20% 0.03 240);
+  --color-base-300: oklch(25% 0.04 240);
+  --color-base-content: oklch(88% 0.02 240);
+
+  --color-primary: oklch(60% 0.28 240);
+  --color-primary-content: oklch(98% 0.01 240);
+
+  --color-secondary: oklch(72% 0.18 80);
+  --color-secondary-content: oklch(15% 0.05 80);
+
+  --color-accent: oklch(65% 0.22 200);
+  --color-accent-content: oklch(98% 0.01 200);
+
+  --color-neutral: oklch(30% 0.03 240);
+  --color-neutral-content: oklch(80% 0.02 240);
+
+  --color-info: oklch(68% 0.18 220);
+  --color-info-content: oklch(98% 0.01 220);
+
+  --color-success: oklch(63% 0.22 140);
+  --color-success-content: oklch(98% 0.01 140);
+
+  --color-warning: oklch(70% 0.2 37);
+  --color-warning-content: oklch(15% 0.03 30);
+
+  --color-error: oklch(63% 0.27 30);
   --color-error-content: oklch(98% 0.01 30);
 }
