@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import type { Artist } from '@/types/artist'
+import ErrorAlert from '@/components/utils/ErrorAlert.vue'
 
 const props = defineProps<{
   artist?: Artist | null
   variant?: 'create' | 'edit'
+  errors?: string[]
 }>()
 
 const emit = defineEmits<{
   submit: [data: Record<string, unknown>]
 }>()
-
-const inputClass = props.variant === 'edit' ? 'input-success' : ''
 </script>
 
 <template>
+  <ErrorAlert :errors="errors ?? []" />
   <FormKit
     type="form"
     id="artist-form"
@@ -28,9 +29,8 @@ const inputClass = props.variant === 'edit' ? 'input-success' : ''
       placeholder="Es. Mitsuhiro Arita"
       validation="required"
       validation-visibility="dirty"
-      :validation-messages="{ required: 'Inserisci username o email' }"
+      :validation-messages="{ required: 'Il nome è obbligatorio' }"
       message-class="text-error text-sm mt-1"
-      :input-class="inputClass"
       outer-class="max-w-full"
     />
   </FormKit>

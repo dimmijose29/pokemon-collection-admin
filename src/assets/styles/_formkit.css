@@ -3,27 +3,26 @@
   color: rgb(148, 148, 148);
 }
 
+/* Variabile per il colore di focus, sovrascrivibile da un parent */
+:root {
+  --formkit-focus-color: var(--color-secondary);
+}
+
 .formkit-input:focus {
-  border-color: oklch(var(--color-secondary)) !important;
-  box-shadow: 0 0 0 1px oklch(var(--color-secondary)) !important;
+  border-color: oklch(var(--formkit-focus-color, var(--color-secondary))) !important;
+  box-shadow: 0 0 0 1px oklch(var(--formkit-focus-color, var(--color-secondary))) !important;
   outline: none;
 }
 
-.input-success:focus {
-  border-color: oklch(var(--color-success)) !important;
-  box-shadow: 0 0 0 1px oklch(var(--color-success)) !important;
-  outline: none;
+/* Basta mettere questa classe su qualsiasi parent per cambiare il colore */
+.formkit-success {
+  --formkit-focus-color: var(--color-success);
 }
 
 #input_0-incomplete {
   display: none;
 }
 
-/* Applicata automaticamente ai messaggi di errore FormKit */
 .formkit-message {
   animation: shake 0.4s ease-in-out;
 }
-/* 
-ul.formkit-messages {
-  display: none;
-} */

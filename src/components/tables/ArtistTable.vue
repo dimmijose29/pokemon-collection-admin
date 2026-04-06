@@ -10,6 +10,7 @@ import { formatDate } from '@/utils/dates'
 import { filterBySearch } from '@/utils/search'
 import { useModalStore } from '@/stores/modal'
 import Artists from '@/api/artists'
+import AppLoading from '@/components/app/AppLoading.vue'
 
 const modalStore = useModalStore()
 const queryClient = useQueryClient()
@@ -45,15 +46,17 @@ const artists = computed(() => {
 const total = computed(() => artists.value.length)
 
 // mutations
-const { mutate: remove } = useMutation({
+const { mutate: remove, isPending: isRemoving } = useMutation({
   mutationFn: (id: number) => Artists.remove(id),
   onSuccess: () => queryClient.invalidateQueries({ queryKey: ['artists'] }),
 })
 
-const { mutate: restore } = useMutation({
+const { mutate: restore, isPending: isRestoring } = useMutation({
   mutationFn: (id: number) => Artists.restore(id),
   onSuccess: () => queryClient.invalidateQueries({ queryKey: ['artists'] }),
 })
+
+const isMutating = computed(() => isRemoving.value || isRestoring.value)
 </script>
 
 <template>
@@ -92,4 +95,6 @@ const { mutate: restore } = useMutation({
       </tr>
     </template>
   </AppTable>
+
+  <AppLoading :visible="isMutating" />
 </template>

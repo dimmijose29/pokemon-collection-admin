@@ -16,15 +16,16 @@ const emit = defineEmits<{
 
 const show = (action: Action) => !props.actions || props.actions.includes(action)
 
+// --- Delete confirm ---
 const pendingDelete = ref(false)
-const popoverX = ref(0)
-const popoverY = ref(0)
+const deleteX = ref(0)
+const deleteY = ref(0)
 let deleteTimer: ReturnType<typeof setTimeout>
 
 function requestDelete(event: MouseEvent) {
   const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-  popoverX.value = rect.left + rect.width / 2 - 30
-  popoverY.value = rect.top - 8
+  deleteX.value = rect.left + rect.width / 2 - 30
+  deleteY.value = rect.top - 8
   pendingDelete.value = true
   deleteTimer = setTimeout(() => {
     pendingDelete.value = false
@@ -37,9 +38,36 @@ function confirmDelete() {
   emit('delete')
 }
 
-function cancel() {
+function cancelDelete() {
   clearTimeout(deleteTimer)
   pendingDelete.value = false
+}
+
+// --- Restore confirm ---
+const pendingRestore = ref(false)
+const restoreX = ref(0)
+const restoreY = ref(0)
+let restoreTimer: ReturnType<typeof setTimeout>
+
+function requestRestore(event: MouseEvent) {
+  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  restoreX.value = rect.left + rect.width / 2 - 30
+  restoreY.value = rect.top - 8
+  pendingRestore.value = true
+  restoreTimer = setTimeout(() => {
+    pendingRestore.value = false
+  }, 5000)
+}
+
+function confirmRestore() {
+  clearTimeout(restoreTimer)
+  pendingRestore.value = false
+  emit('restore')
+}
+
+function cancelRestore() {
+  clearTimeout(restoreTimer)
+  pendingRestore.value = false
 }
 </script>
 
@@ -70,29 +98,48 @@ function cancel() {
       class="btn btn-ghost btn-xs btn-square text-warning tooltip tooltip-warning"
       data-tip="Ripristina"
       title="Ripristina"
-      @click="emit('restore')"
+      @click="requestRestore($event)"
     >
       <RotateCcw class="w-3.5 h-3.5" />
     </button>
   </div>
 
+  <!-- Popover delete -->
   <div v-if="pendingDelete">
-    <!-- Backdrop trasparente per click-outside -->
-    <div class="fixed inset-0 z-[9998]" @click="cancel" />
-
-    <!-- Popover -->
+    <div class="fixed inset-0 z-[9998]" @click="cancelDelete" />
     <div
       v-motion-slide-bottom
       class="fixed z-[9999] -translate-x-1/2 -translate-y-full"
-      :style="{ top: `${popoverY}px`, left: `${popoverX}px` }"
+      :style="{ top: `${deleteY}px`, left: `${deleteX}px` }"
     >
       <div class="bg-base-100 border border-base-300 rounded-xl shadow-xl p-2 w-52">
         <div class="flex gap-2">
           <button class="btn btn-error btn-xs flex-1" @click="confirmDelete">
-            <BadgeAlert class="w-3 h-3" />Conferma
+            <BadgeAlert class="w-3 h-3" /> Conferma
           </button>
-          <button class="btn btn-ghost btn-xs flex-1" @click="cancel">
-            <X class="w-3 h-3" />Annulla
+          <button class="btn btn-ghost btn-xs flex-1" @click="cancelDelete">
+            <X class="w-3 h-3" /> Annulla
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popover restore -->
+  <div v-if="pendingRestore">
+    <div class="fixed inset-0 z-[9998]" @click="cancelRestore" />
+    <div
+      v-motion-slide-bottom
+      class="fixed z-[9999] -translate-x-1/2 -translate-y-full"
+      :style="{ top: `${restoreY}px`, left: `${restoreX}px` }"
+    >
+      <div class="bg-base-100 border border-base-300 rounded-xl shadow-xl p-2 w-52">
+        <div class="flex gap-2">
+          <button class="btn btn-warning btn-xs flex-1" @click="confirmRestore">
+            <RotateCcw class="w-3 h-3" /> Ripristina
+          </button>
+          <button class="btn btn-ghost btn-xs flex-1" @click="cancelRestore">
+            <X class="w-3 h-3" /> Annulla
           </button>
         </div>
       </div>
