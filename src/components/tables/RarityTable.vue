@@ -25,10 +25,10 @@ const { data, isLoading, isFetching, refetch } = useQuery({
   placeholderData: (prev) => prev,
 })
 
-const allRaritys = computed(() => data.value ?? [])
+const allRarities = computed(() => data.value ?? [])
 
 const rarities = computed(() => {
-  let filtered = allRaritys.value
+  let filtered = allRarities.value
 
   if (statusFilter.value === 'active') {
     filtered = filtered.filter((a) => !a.deleted_at)

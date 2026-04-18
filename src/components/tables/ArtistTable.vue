@@ -9,16 +9,18 @@ import type { StatusFilterValue } from '@/components/shared/StatusFilter.vue'
 import { formatDate } from '@/utils/dates'
 import { filterBySearch } from '@/utils/search'
 import { useModalStore } from '@/stores/modal'
+import { useToast } from '@/composables/useToast'
 import Artists from '@/api/artists'
 import AppLoading from '@/components/app/AppLoading.vue'
-import { useToast } from '@/composables/useToast'
 
 const modalStore = useModalStore()
 const queryClient = useQueryClient()
-const search = ref('')
-const statusFilter = ref<StatusFilterValue>('active')
 const { show } = useToast()
 
+const search = ref('')
+const statusFilter = ref<StatusFilterValue>('active')
+
+// Carica tutti gli artisti inclusi i soft-deleted per gestire il filtro lato client
 const { data, isLoading, isFetching, refetch } = useQuery({
   queryKey: ['artists'],
   queryFn: () => Artists.get({ withTrashed: true }),
@@ -28,6 +30,7 @@ const { data, isLoading, isFetching, refetch } = useQuery({
 
 const allArtists = computed(() => data.value ?? [])
 
+// Filtra per stato (attivo/eliminato) e per ricerca testuale
 const artists = computed(() => {
   let filtered = allArtists.value
 
@@ -47,23 +50,25 @@ const artists = computed(() => {
 
 const total = computed(() => artists.value.length)
 
-// mutations
+// Soft-delete
 const { mutate: remove, isPending: isRemoving } = useMutation({
   mutationFn: (id: number) => Artists.remove(id),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['artists'] })
-    show('Artista eliminato con successo')
+    show('Artista eliminato', 'error')
   },
 })
 
+// Ripristino da soft-delete
 const { mutate: restore, isPending: isRestoring } = useMutation({
   mutationFn: (id: number) => Artists.restore(id),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['artists'] })
-    show('Artista ripristinato con successo')
+    show('Artista ripristinato')
   },
 })
 
+// true mentre una qualsiasi mutation è in corso (mostra AppLoading)
 const isMutating = computed(() => isRemoving.value || isRestoring.value)
 </script>
 
