@@ -34,7 +34,7 @@ async function handleLogout() {
 <template>
   <div>
     <header
-      class="h-16 bg-secondary border-b border-base-300 flex items-center px-4 md:px-6 gap-4 shrink-0"
+      class="h-16 bg-base-100 border-b border-base-300 flex items-center px-4 md:px-6 gap-4 shrink-0"
     >
       <!-- Logo -->
       <RouterLink :to="{ name: 'dashboard' }" class="flex items-center gap-2 shrink-0">

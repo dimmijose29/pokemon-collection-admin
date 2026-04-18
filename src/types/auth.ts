@@ -10,7 +10,7 @@ export interface LoginSuccessResponse {
 }
 
 export interface TwoFactorChallengeResponse {
-  two_factor_required: true // snake_case come arriva dall'API
+  two_factor_required: true
   message: string
   temp_token: string
 }
@@ -22,4 +22,5 @@ export interface User {
   email: string
   username?: string
   is_admin: boolean
+  is_2fa_enabled: boolean
 }

@@ -19,10 +19,6 @@
   --formkit-focus-color: var(--color-success);
 }
 
-#input_0-incomplete {
-  display: none;
-}
-
 .formkit-message {
   animation: shake 0.4s ease-in-out;
 }

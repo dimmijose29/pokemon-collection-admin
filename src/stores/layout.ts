@@ -5,7 +5,7 @@ type LayoutMode = 'sidebar' | 'topnav'
 
 const LIGHT_THEME = 'pokemon'
 const DARK_THEME = 'pokemon-dark'
-const FONT_SIZES = [13, 14, 15, 16, 17, 18] // px, level 0-5
+const FONT_SIZES = [14, 15, 16, 17, 18, 19] // px, level 0-5
 
 export const useLayoutStore = defineStore('layout', () => {
   const mode = ref<LayoutMode>((localStorage.getItem('layout-mode') as LayoutMode) || 'sidebar')

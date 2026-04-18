@@ -41,7 +41,7 @@ async function handleLogout() {
   <aside
     :class="[
       'flex flex-col h-screen bg-base-200 border-r border-base-300',
-      'transition-all duration-300 ease-in-out shrink-0',
+      'transition-[width,transform] duration-300 ease-in-out shrink-0',
       'fixed inset-y-0 left-0 z-40',
       layout.sidebarOpen ? 'translate-x-0' : '-translate-x-full',
       'lg:relative lg:inset-auto lg:translate-x-0',
@@ -76,7 +76,7 @@ async function handleLogout() {
         <!-- Group label -->
         <div
           v-if="group.label"
-          class="px-3 pb-1 text-xs font-semibold uppercase tracking-widest text-base-content/40 overflow-hidden whitespace-nowrap transition-all duration-300"
+          class="px-3 pb-1 text-xs font-semibold uppercase tracking-widest text-base-content/40 overflow-hidden whitespace-nowrap transition-[max-height,opacity,padding] duration-300"
           :class="
             collapsed ? 'pt-2 lg:max-h-0 lg:opacity-0 lg:pt-0 lg:pb-0' : 'pt-4 max-h-10 opacity-100'
           "
@@ -97,7 +97,7 @@ async function handleLogout() {
             >
               <component :is="item.icon" class="w-5 h-5 shrink-0" />
               <span
-                class="whitespace-nowrap transition-all duration-300 overflow-hidden"
+                class="whitespace-nowrap transition-[max-width,opacity] duration-300 overflow-hidden"
                 :class="collapsed ? 'lg:max-w-0 lg:opacity-0' : 'max-w-full opacity-100'"
               >
                 {{ item.label }}

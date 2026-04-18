@@ -11,5 +11,6 @@ export default defaultConfig({
   },
   config: {
     rootClasses,
+    incompleteMessage: false,
   },
 })

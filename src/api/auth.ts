@@ -21,8 +21,8 @@ export const confirm2FA = async (code: string) => {
   return response.data
 }
 
-export const disable2FA = async () => {
-  const response = await https.post('/auth/2fa/disable')
+export const disable2FA = async (code: string) => {
+  const response = await https.post('/auth/2fa/disable', { code })
   return response.data
 }
 
@@ -38,4 +38,20 @@ export const me = async () => {
 
 export const logout = async () => {
   await https.post('/auth/logout')
+}
+
+export const updateProfile = async (data: { username: string }) => {
+  const response = await https.put('/auth/me', data)
+  return response.data
+}
+
+export const updatePassword = async (
+  userId: number,
+  data: {
+    password: string
+    password_confirmation: string
+  },
+) => {
+  const response = await https.put(`/auth/${userId}/update-password`, data)
+  return response.data
 }
