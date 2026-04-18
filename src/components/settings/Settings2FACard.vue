@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { Shield } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { useErrorList } from '@/composables/useErrorList'
-import { enable2FA, confirm2FA, disable2FA, me } from '@/api/auth'
+import { enable2FA, confirm2FA, disable2FA, cancelSetup2FA, me } from '@/api/auth'
 import Settings2FAForm from '@/components/forms/Settings2FAForm.vue'
 
 const authStore = useAuthStore()
@@ -44,8 +44,17 @@ async function handleConfirm(code: string) {
 }
 
 async function handleCancelSetup() {
-  authStore.fillUser(await me())
-  step.value = 'idle'
+  loading.value = true
+  clearErrors()
+  try {
+    await cancelSetup2FA()
+    authStore.fillUser(await me())
+    step.value = 'idle'
+  } catch (e) {
+    setErrors(e)
+  } finally {
+    loading.value = false
+  }
 }
 
 async function handleDisable(code: string) {

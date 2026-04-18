@@ -11,11 +11,13 @@ import { filterBySearch } from '@/utils/search'
 import { useModalStore } from '@/stores/modal'
 import Artists from '@/api/artists'
 import AppLoading from '@/components/app/AppLoading.vue'
+import { useToast } from '@/composables/useToast'
 
 const modalStore = useModalStore()
 const queryClient = useQueryClient()
 const search = ref('')
 const statusFilter = ref<StatusFilterValue>('active')
+const { show } = useToast()
 
 const { data, isLoading, isFetching, refetch } = useQuery({
   queryKey: ['artists'],
@@ -48,12 +50,18 @@ const total = computed(() => artists.value.length)
 // mutations
 const { mutate: remove, isPending: isRemoving } = useMutation({
   mutationFn: (id: number) => Artists.remove(id),
-  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['artists'] }),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['artists'] })
+    show('Artista eliminato con successo')
+  },
 })
 
 const { mutate: restore, isPending: isRestoring } = useMutation({
   mutationFn: (id: number) => Artists.restore(id),
-  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['artists'] }),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['artists'] })
+    show('Artista ripristinato con successo')
+  },
 })
 
 const isMutating = computed(() => isRemoving.value || isRestoring.value)

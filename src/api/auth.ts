@@ -26,6 +26,11 @@ export const disable2FA = async (code: string) => {
   return response.data
 }
 
+export const cancelSetup2FA = async () => {
+  const response = await https.post('/auth/2fa/cancel')
+  return response.data
+}
+
 export const forgotPassword = async (email: string) => {
   const response = await https.post('/auth/forgot-password', { email })
   return response.data

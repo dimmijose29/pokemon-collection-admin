@@ -2,6 +2,7 @@ import { ref, watch } from 'vue'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useModalStore } from '@/stores/modal'
 import { useErrorList } from '@/composables/useErrorList'
+import { useToast } from '@/composables/useToast'
 import Artists from '@/api/artists'
 import type { Artist } from '@/types/artist'
 
@@ -10,6 +11,7 @@ export function useArtistModal() {
   const queryClient = useQueryClient()
   const loading = ref(false)
   const { setErrors, clearErrors, allErrors } = useErrorList()
+  const { show } = useToast()
 
   watch(
     () => modalStore.isOpen,
@@ -24,9 +26,11 @@ export function useArtistModal() {
     try {
       if (modalStore.mode === 'create') {
         await Artists.create(data as { name: string })
+        show('Artista creato con successo')
       } else {
         const artist = modalStore.currentData as Artist
         await Artists.update(artist.id, data as { name: string })
+        show('Artista aggiornato con successo')
       }
       await queryClient.invalidateQueries({ queryKey: ['artists'] })
       modalStore.close()

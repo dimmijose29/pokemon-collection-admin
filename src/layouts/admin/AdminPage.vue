@@ -5,6 +5,7 @@ import { useLayoutStore } from '@/stores/layout'
 import AdminSidebar from '@/layouts/admin/AdminSidebar.vue'
 import AdminTopbar from '@/layouts/admin/AdminTopbar.vue'
 import AdminNavbar from '@/layouts/admin/AdminNavbar.vue'
+import AppToast from '@/components/utils/AppToast.vue'
 
 const layout = useLayoutStore()
 const route = useRoute()
@@ -54,4 +55,6 @@ watch(
       <RouterView />
     </main>
   </div>
+
+  <AppToast />
 </template>

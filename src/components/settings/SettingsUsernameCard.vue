@@ -1,27 +1,24 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { User, Check } from 'lucide-vue-next'
+import { User } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { useErrorList } from '@/composables/useErrorList'
+import { useToast } from '@/composables/useToast'
 import { updateProfile } from '@/api/auth'
 import SettingsUsernameForm from '@/components/forms/SettingsUsernameForm.vue'
 
 const authStore = useAuthStore()
 const loading = ref(false)
-const success = ref(false)
 const { allErrors, setErrors, clearErrors } = useErrorList()
+const { show } = useToast()
 
 async function handleSubmit(data: Record<string, unknown>) {
   loading.value = true
-  success.value = false
   clearErrors()
   try {
     const updated = await updateProfile({ username: data.username as string })
     authStore.fillUser(updated)
-    success.value = true
-    setTimeout(() => {
-      success.value = false
-    }, 2500)
+    show('Username aggiornato con successo')
   } catch (e) {
     setErrors(e)
   } finally {
@@ -51,17 +48,4 @@ async function handleSubmit(data: Record<string, unknown>) {
       />
     </div>
   </div>
-
-  <Transition
-    enter-active-class="transition-all duration-300 ease-out"
-    enter-from-class="opacity-0 translate-y-2 scale-95"
-    leave-active-class="transition-all duration-200 ease-in"
-    leave-to-class="opacity-0 translate-y-2 scale-95"
-  >
-    <div v-if="success" class="toast toast-end z-50">
-      <div class="alert alert-success shadow-lg">
-        <Check class="w-4 h-4 shrink-0" /> Username aggiornato con successo
-      </div>
-    </div>
-  </Transition>
 </template>
