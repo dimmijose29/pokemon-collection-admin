@@ -10,6 +10,8 @@ import {
   Settings,
   BookOpen,
   Users,
+  SquareStack,
+  Library,
 } from 'lucide-vue-next'
 import type { Component } from 'vue'
 
@@ -42,11 +44,25 @@ export const adminNavGroups: NavGroup[] = [
     label: 'Catalogo',
     items: [
       {
+        label: 'Serie',
+        routeName: 'series',
+        path: 'serie',
+        icon: Library,
+        component: () => import('@/views/SeriesView.vue'),
+      },
+      {
         label: 'Set',
         routeName: 'sets',
         path: 'sets',
         icon: BookOpen,
         component: () => import('@/views/SetsView.vue'),
+      },
+      {
+        label: 'Carte',
+        routeName: 'cards',
+        path: 'carte',
+        icon: SquareStack,
+        component: () => import('@/views/CardsView.vue'),
       },
       {
         label: 'Artisti',

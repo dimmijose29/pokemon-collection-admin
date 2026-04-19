@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { LayoutList } from 'lucide-vue-next'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import AppTable from '@/components/app/AppTable.vue'
 import ActionColumn from '@/components/shared/ActionColumn.vue'
 import StatusFilter from '@/components/shared/StatusFilter.vue'
@@ -22,6 +22,7 @@ const modalStore = useModalStore()
 const queryClient = useQueryClient()
 const { show } = useToast()
 const router = useRouter()
+const route  = useRoute()
 
 const search = ref('')
 const statusFilter = ref<StatusFilterValue>('active')
@@ -83,6 +84,14 @@ const { mutate: restore, isPending: isRestoring } = useMutation({
 })
 
 const isMutating = computed(() => isRemoving.value || isRestoring.value)
+
+// Pre-popola il filtro serie dal query param (es. navigando da SeriesTable → "Vedi set")
+onMounted(() => {
+  const q = route.query.series
+  if (q) {
+    seriesFilter.value = Array.isArray(q) ? (q.filter(Boolean) as string[]) : [q as string]
+  }
+})
 
 const sortedSets = computed(() => {
   if (!sort.value) return sets.value

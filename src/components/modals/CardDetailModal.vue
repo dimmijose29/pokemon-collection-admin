@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { X, TrendingUp } from 'lucide-vue-next'
+import { X, TrendingUp, ExternalLink } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
 import Card3DViewer from '@/components/utils/Card3DViewer.vue'
 import type { Card } from '@/types/card'
 import type { Set } from '@/types/set'
-import { getEnergyClass, getCardTypeClass, getStageClass } from '@/utils/pokemon'
+import { getEnergyStyle, getCardTypeClass, getStageClass } from '@/utils/pokemon'
 
 const props = defineProps<{
   modelValue: boolean
@@ -16,14 +17,30 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
 
+const router = useRouter()
+
 function close() {
   emit('update:modelValue', false)
 }
 
+function goToSet() {
+  const id = setInfo.value?.id
+  if (!id) return
+  close()
+  router.push({ name: 'set-cards', params: { id } })
+}
+
+function goToSeries() {
+  const sName = seriesName(setInfo.value?.series)
+  if (!sName) return
+  close()
+  router.push({ name: 'sets', query: { series: sName } })
+}
+
 function cardName(card: Card): string {
-  const it = card.translations?.find((t) => t.language?.code === 'it')
   const en = card.translations?.find((t) => t.language?.code === 'en')
-  return it?.name ?? en?.name ?? card.translations?.[0]?.name ?? card.tcgdex_id
+  const it = card.translations?.find((t) => t.language?.code === 'it')
+  return en?.name ?? it?.name ?? card.translations?.[0]?.name ?? card.tcgdex_id
 }
 
 const name = computed(() => (props.card ? cardName(props.card) : ''))
@@ -38,9 +55,11 @@ const formattedPrice = computed(() => {
 
 // Set info: usa il set passato come prop, altrimenti fallback alla relazione nella carta
 const setInfo = computed<{
+  id?: number
+  tcgdex_id?: string
   name: string
   logo_url?: string | null
-  series?: { name: string } | string | null
+  series?: { id?: number; name: string } | string | null
   release_date?: string | null
 } | null>(() => props.set ?? props.card?.set ?? null)
 
@@ -83,11 +102,26 @@ function seriesName(s: { name: string } | string | null | undefined): string | n
                   :src="setInfo.logo_url"
                   :alt="setInfo.name"
                   class="h-7 max-w-[7rem] object-contain opacity-90"
+                  :class="setInfo.id ? 'cursor-pointer hover:opacity-100 transition-opacity' : ''"
+                  @click="setInfo?.id && goToSet()"
                 />
                 <div v-if="setInfo" class="min-w-0">
-                  <div class="font-semibold text-sm text-base-content/80 truncate">{{ setInfo.name }}</div>
+                  <!-- Nome set cliccabile -->
+                  <div
+                    class="font-semibold text-sm text-base-content/80 truncate flex items-center gap-1"
+                    :class="setInfo.id ? 'cursor-pointer hover:text-secondary transition-colors' : ''"
+                    @click="setInfo.id && goToSet()"
+                  >
+                    {{ setInfo.name }}
+                    <ExternalLink v-if="setInfo.id" class="w-3 h-3 opacity-40 shrink-0" />
+                  </div>
+                  <!-- Serie cliccabile + anno -->
                   <div class="text-xs text-base-content/40 flex items-center gap-1.5">
-                    <span v-if="seriesName(setInfo.series)">{{ seriesName(setInfo.series) }}</span>
+                    <span
+                      v-if="seriesName(setInfo.series)"
+                      :class="seriesName(setInfo.series) ? 'cursor-pointer hover:text-secondary transition-colors' : ''"
+                      @click="goToSeries()"
+                    >{{ seriesName(setInfo.series) }}</span>
                     <span v-if="seriesName(setInfo.series) && setInfo.release_date">·</span>
                     <span v-if="setInfo.release_date">{{ setInfo.release_date.substring(0, 4) }}</span>
                   </div>
@@ -163,8 +197,8 @@ function seriesName(s: { name: string } | string | null | undefined): string | n
                     <span
                       v-for="e in card.energy_types"
                       :key="e"
-                      class="badge badge-sm"
-                      :class="getEnergyClass(e)"
+                      class="badge badge-sm border"
+                      :style="getEnergyStyle(e)"
                     >{{ e }}</span>
                   </div>
 
@@ -180,11 +214,24 @@ function seriesName(s: { name: string } | string | null | undefined): string | n
                     </div>
                     <div v-if="setInfo" class="flex flex-col gap-0.5">
                       <span class="text-base-content/40 text-xs uppercase tracking-wider">Espansione</span>
-                      <span class="font-medium">{{ setInfo.name }}</span>
+                      <span
+                        class="font-medium flex items-center gap-1"
+                        :class="setInfo.id ? 'cursor-pointer hover:text-secondary transition-colors' : ''"
+                        @click="setInfo?.id && goToSet()"
+                      >
+                        {{ setInfo.name }}
+                        <ExternalLink v-if="setInfo.id" class="w-3 h-3 opacity-40" />
+                      </span>
                     </div>
                     <div v-if="seriesName(setInfo?.series)" class="flex flex-col gap-0.5">
                       <span class="text-base-content/40 text-xs uppercase tracking-wider">Serie</span>
-                      <span class="font-medium">{{ seriesName(setInfo?.series) }}</span>
+                      <span
+                        class="font-medium flex items-center gap-1 cursor-pointer hover:text-secondary transition-colors"
+                        @click="goToSeries()"
+                      >
+                        {{ seriesName(setInfo?.series) }}
+                        <ExternalLink class="w-3 h-3 opacity-40" />
+                      </span>
                     </div>
                   </div>
 
