@@ -8,6 +8,8 @@ import {
   Languages,
   DollarSign,
   Settings,
+  BookOpen,
+  Users,
 } from 'lucide-vue-next'
 import type { Component } from 'vue'
 
@@ -39,6 +41,13 @@ export const adminNavGroups: NavGroup[] = [
   {
     label: 'Catalogo',
     items: [
+      {
+        label: 'Set',
+        routeName: 'sets',
+        path: 'sets',
+        icon: BookOpen,
+        component: () => import('@/views/SetsView.vue'),
+      },
       {
         label: 'Artisti',
         routeName: 'artists',
@@ -93,6 +102,13 @@ export const adminNavGroups: NavGroup[] = [
   {
     label: 'Sistema',
     items: [
+      {
+        label: 'Utenti',
+        routeName: 'users',
+        path: 'utenti',
+        icon: Users,
+        component: () => import('@/views/UsersView.vue'),
+      },
       {
         label: 'Impostazioni',
         routeName: 'settings-profile',

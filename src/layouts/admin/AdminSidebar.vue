@@ -121,9 +121,10 @@ async function handleLogout() {
 
       <!-- Desktop expanded + mobile: footer completo -->
       <div class="p-3 flex items-center gap-3" :class="collapsed ? 'lg:hidden' : ''">
-        <div class="avatar placeholder shrink-0">
-          <div class="bg-secondary text-primary-content rounded-full w-8">
-            <span class="text-xs font-bold block text-center mt-2 text-black">
+        <div class="avatar shrink-0" :class="authStore.user?.avatar_url ? '' : 'placeholder'">
+          <div class="rounded-full w-8 overflow-hidden" :class="authStore.user?.avatar_url ? '' : 'bg-secondary text-primary-content'">
+            <img v-if="authStore.user?.avatar_url" :src="authStore.user.avatar_url" :alt="authStore.user?.username" class="w-full h-full object-cover" />
+            <span v-else class="text-xs font-bold block text-center mt-2 text-black">
               {{ authStore.user?.username?.charAt(0)?.toUpperCase() ?? '?' }}
             </span>
           </div>

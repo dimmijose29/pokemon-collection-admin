@@ -23,4 +23,7 @@ export interface User {
   username?: string
   is_admin: boolean
   is_2fa_enabled: boolean
+  avatar_url?: string | null
+  country?: string | null
+  bio?: string | null
 }

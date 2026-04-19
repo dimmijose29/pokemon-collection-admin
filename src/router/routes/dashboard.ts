@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { adminNavGroups } from '@/config/adminNav'
+import { SquareStack } from 'lucide-vue-next'
 
 const adminChildren: RouteRecordRaw[] = adminNavGroups
   .flatMap((group) => group.items)
@@ -18,6 +19,15 @@ export const dashboardRoutes: RouteRecordRaw[] = [
     path: '/',
     component: () => import('@/layouts/admin/AdminPage.vue'),
     meta: { requiresAuth: true },
-    children: adminChildren,
+    children: [
+      ...adminChildren,
+      // Route con parametri — non possono stare in adminNav
+      {
+        path: 'sets/:id/carte',
+        name: 'set-cards',
+        component: () => import('@/views/SetCardsView.vue'),
+        meta: { title: 'Carte del set', icon: SquareStack },
+      },
+    ],
   },
 ]

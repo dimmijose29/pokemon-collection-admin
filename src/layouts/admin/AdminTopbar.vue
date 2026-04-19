@@ -54,9 +54,10 @@ async function handleLogout() {
 
     <!-- User dropdown -->
     <div class="dropdown dropdown-end">
-      <div tabindex="0" role="button" class="avatar placeholder cursor-pointer">
-        <div class="bg-gray-300 text-primary-content rounded-full w-9">
-          <span class="text-sm font-bold block text-center mt-2 text-black">
+      <div tabindex="0" role="button" class="avatar cursor-pointer" :class="authStore.user?.avatar_url ? '' : 'placeholder'">
+        <div class="rounded-full w-9 overflow-hidden" :class="authStore.user?.avatar_url ? '' : 'bg-gray-300 text-primary-content'">
+          <img v-if="authStore.user?.avatar_url" :src="authStore.user.avatar_url" :alt="authStore.user?.username" class="w-full h-full object-cover" />
+          <span v-else class="text-sm font-bold block text-center mt-2 text-black">
             {{ authStore.user?.username?.charAt(0)?.toUpperCase() ?? '?' }}
           </span>
         </div>

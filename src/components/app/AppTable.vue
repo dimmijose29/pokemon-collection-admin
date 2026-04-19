@@ -36,6 +36,9 @@ const search = defineModel<string>('search', { default: '' })
           />
         </div>
 
+        <!-- Azioni (es. pulsante crea) -->
+        <slot name="actions" />
+
         <button class="btn btn-sm btn-soft gap-2" :disabled="refreshing" @click="emit('refresh')">
           <RefreshCw class="w-4 h-4" :class="refreshing ? 'animate-spin' : ''" />
           <span class="hidden sm:inline">Aggiorna</span>
