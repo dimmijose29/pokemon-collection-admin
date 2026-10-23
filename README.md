@@ -9,8 +9,8 @@ Pannello di amministrazione per l'applicazione Pokémon Collection, costruito co
 | Tecnologia | Versione | Utilizzo |
 |---|---|---|
 | Vue 3 | 3.5 | Framework UI (Composition API + `<script setup>`) |
-| TypeScript | 5.9 | Tipizzazione |
-| Vite | 7.x | Build tool e dev server |
+| TypeScript | 6.0 | Tipizzazione |
+| Vite | 8.x | Build tool e dev server |
 | Tailwind CSS | 4.x | Utility CSS |
 | DaisyUI | 5.x | Componenti UI (temi `pokemon` / `pokemon-dark`) |
 | VeeValidate + Zod | 4.x / 4.x | Form e validazione (schemi in `src/validation`) |
@@ -28,7 +28,7 @@ Pannello di amministrazione per l'applicazione Pokémon Collection, costruito co
 
 ## Requisiti
 
-- Node.js ^20.19 oppure >= 22.12 (richiesto da Vite 7)
+- Node.js ^20.19 oppure >= 22.12 (richiesto da Vite 8)
 - npm >= 10
 - L'API `pokemon-collection-api` in esecuzione
 
