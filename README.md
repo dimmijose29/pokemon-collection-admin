@@ -20,7 +20,7 @@ Pannello di amministrazione per l'applicazione Pokémon Collection, costruito co
 | Chart.js | 4.x | Grafici della dashboard |
 | Lucide Vue Next | — | Icone |
 | Vue Router | 5.x | Routing |
-| Vitest | 3.x | Test |
+| Vitest | 4.x | Test (con Testing Library) |
 
 ---
 

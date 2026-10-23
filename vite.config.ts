@@ -17,6 +17,8 @@ export default defineConfig({
   test: {
     // Simula un ambiente browser (window, document, ecc.)
     environment: 'jsdom',
+    // Fuso orario fisso: i test sulle date danno lo stesso risultato su ogni macchina
+    env: { TZ: 'Europe/Rome' },
     // Rende disponibili describe/it/expect senza import espliciti
     globals: true,
     // File eseguito prima di ogni suite: registra plugin globali (FormKit, ecc.)
