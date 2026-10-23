@@ -57,11 +57,11 @@ async function handleCancelSetup() {
   }
 }
 
-async function handleDisable(code: string) {
+async function handleDisable(code: string, password: string) {
   loading.value = true
   clearErrors()
   try {
-    await disable2FA(code)
+    await disable2FA(code, password)
     authStore.fillUser(await me())
     step.value = 'idle'
   } catch (e) {

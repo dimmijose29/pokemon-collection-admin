@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Lock } from 'lucide-vue-next'
-import { useAuthStore } from '@/stores/auth'
 import { useErrorList } from '@/composables/useErrorList'
 import { useToast } from '@/composables/useToast'
 import { updatePassword } from '@/api/auth'
 import SettingsPasswordForm from '@/components/forms/SettingsPasswordForm.vue'
 
-const authStore = useAuthStore()
 const loading = ref(false)
 const { allErrors, setErrors, clearErrors } = useErrorList()
 const { show } = useToast()
@@ -16,11 +14,12 @@ async function handleSubmit(data: Record<string, unknown>) {
   loading.value = true
   clearErrors()
   try {
-    await updatePassword(authStore.user!.id, {
+    await updatePassword({
+      current_password: data.current_password as string,
       password: data.new_password as string,
       password_confirmation: data.new_password_confirm as string,
     })
-    show('Password aggiornata con successo')
+    show('Password aggiornata con successo. Le altre sessioni sono state disconnesse.')
   } catch (e) {
     setErrors(e)
   } finally {

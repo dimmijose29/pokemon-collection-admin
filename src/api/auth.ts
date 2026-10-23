@@ -21,8 +21,8 @@ export const confirm2FA = async (code: string) => {
   return response.data
 }
 
-export const disable2FA = async (code: string) => {
-  const response = await https.post('/auth/2fa/disable', { code })
+export const disable2FA = async (code: string, password: string) => {
+  const response = await https.post('/auth/2fa/disable', { code, password })
   return response.data
 }
 
@@ -50,13 +50,22 @@ export const updateProfile = async (data: { username: string }) => {
   return response.data
 }
 
-export const updatePassword = async (
-  userId: number,
-  data: {
-    password: string
-    password_confirmation: string
-  },
-) => {
-  const response = await https.put(`/auth/${userId}/update-password`, data)
+export const resetPassword = async (data: {
+  token: string
+  email: string
+  password: string
+  password_confirmation: string
+}) => {
+  const response = await https.post('/auth/reset-password', data)
+  return response.data
+}
+
+// Agisce sempre sull'utente autenticato
+export const updatePassword = async (data: {
+  current_password: string
+  password: string
+  password_confirmation: string
+}) => {
+  const response = await https.put('/auth/password', data)
   return response.data
 }

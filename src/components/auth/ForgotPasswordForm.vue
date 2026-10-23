@@ -46,7 +46,7 @@ async function handleSubmit() {
           <Mail class="w-16 h-16 mx-auto text-success mb-4" />
           <h2 class="text-2xl font-heading mb-2">Email inviata!</h2>
           <p class="text-base-content/60 mb-6">
-            Controlla la tua casella di posta per vedere le nuove credenziali di accesso.
+            Se l'indirizzo è registrato, riceverai a breve un link per reimpostare la password.
           </p>
           <RouterLink to="/" class="btn btn-secondary btn-outline">
             <ArrowLeft class="w-4 h-4" />
@@ -59,7 +59,7 @@ async function handleSubmit() {
       <template v-else>
         <h2 class="text-2xl font-heading text-center mb-2">Recupera password</h2>
         <p class="text-sm text-base-content/60 text-center mb-6">
-          Inserisci la tua email e ti invieremo le nuove credenziali di accesso.
+          Inserisci la tua email e ti invieremo un link per reimpostare la password.
         </p>
 
         <ErrorAlert :errors="errors" />
@@ -95,7 +95,7 @@ async function handleSubmit() {
             :disabled="loading"
           >
             <span v-if="loading" class="loading loading-spinner loading-sm"></span>
-            Invia credenziali
+            Invia link
           </button>
         </FormKit>
 

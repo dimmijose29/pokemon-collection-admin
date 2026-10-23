@@ -23,6 +23,16 @@ const emit = defineEmits<{
   >
     <FormKit
       type="password"
+      name="current_password"
+      label="Password attuale"
+      placeholder="••••••••"
+      autocomplete="current-password"
+      validation="required"
+      validation-visibility="dirty"
+      :validation-messages="{ required: 'Campo obbligatorio' }"
+    />
+    <FormKit
+      type="password"
       name="new_password"
       label="Nuova password"
       placeholder="••••••••"

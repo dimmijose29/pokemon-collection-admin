@@ -18,7 +18,7 @@ const emit = defineEmits<{
   confirm: [code: string]
   cancelSetup: []
   startDisable: []
-  disable: [code: string]
+  disable: [code: string, password: string]
   cancelDisable: []
 }>()
 </script>
@@ -83,7 +83,7 @@ const emit = defineEmits<{
     <TwoFADisableForm
       v-if="step === 'disabling'"
       :loading="loading"
-      @disable="(code) => emit('disable', code)"
+      @disable="(code, password) => emit('disable', code, password)"
       @cancel="emit('cancelDisable')"
     />
   </Transition>

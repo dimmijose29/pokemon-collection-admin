@@ -3,22 +3,35 @@ import { ref } from 'vue'
 import { X } from 'lucide-vue-next'
 
 defineProps<{ loading: boolean }>()
-const emit = defineEmits<{ disable: [code: string]; cancel: [] }>()
+const emit = defineEmits<{ disable: [code: string, password: string]; cancel: [] }>()
 
 const code = ref('')
+const password = ref('')
 
 function submit() {
-  emit('disable', code.value)
+  if (code.value.length < 6 || !password.value) return
+  emit('disable', code.value, password.value)
 }
 </script>
 
 <template>
   <div class="flex flex-col gap-3">
     <p class="text-sm text-base-content/70">
-      Inserisci il codice dall'app authenticator per confermare la disattivazione.
+      Inserisci la tua password e il codice dall'app authenticator per confermare la
+      disattivazione.
     </p>
 
     <div class="flex items-end gap-2 flex-wrap">
+      <FormKit
+        v-model="password"
+        type="password"
+        name="password"
+        label="Password"
+        autocomplete="current-password"
+        placeholder="••••••••"
+        outer-class="mb-0 max-w-[220px]"
+        @keydown.enter.prevent="submit"
+      />
       <FormKit
         v-model="code"
         type="text"
@@ -36,7 +49,7 @@ function submit() {
         <button
           type="button"
           class="btn btn-sm btn-error"
-          :disabled="loading || code.length < 6"
+          :disabled="loading || code.length < 6 || !password"
           @click="submit"
         >
           <span v-if="loading" class="loading loading-spinner loading-xs" />
