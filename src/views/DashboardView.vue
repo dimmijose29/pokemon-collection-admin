@@ -2,9 +2,17 @@
 import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import {
-  Layers, BookOpen, Users, Tag,
-  TrendingUp, Gem, Wallet,
-  PieChart, BarChart2, CalendarDays, Coins,
+  Layers,
+  BookOpen,
+  Users,
+  Tag,
+  TrendingUp,
+  Gem,
+  Wallet,
+  PieChart,
+  BarChart2,
+  CalendarDays,
+  Coins,
   CreditCard,
 } from 'lucide-vue-next'
 import AppPage from '@/layouts/AppPage.vue'
@@ -33,9 +41,9 @@ const pricedPct = computed(() => {
 
 const cardsPerRarity = computed(() => data.value?.charts.cards_per_rarity ?? [])
 const cardsPerSeries = computed(() => data.value?.charts.cards_per_series ?? [])
-const setsPerYear    = computed(() => data.value?.charts.sets_per_year ?? [])
-const priceRanges    = computed(() => data.value?.charts.price_ranges ?? [])
-const topCards       = computed(() => data.value?.top_cards ?? [])
+const setsPerYear = computed(() => data.value?.charts.sets_per_year ?? [])
+const priceRanges = computed(() => data.value?.charts.price_ranges ?? [])
+const topCards = computed(() => data.value?.top_cards ?? [])
 </script>
 
 <template>
@@ -55,7 +63,6 @@ const topCards       = computed(() => data.value?.top_cards ?? [])
     </div>
 
     <div v-else class="space-y-6">
-
       <!-- KPI principali -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard label="Espansioni" accent="secondary" :icon="Layers">
@@ -84,15 +91,26 @@ const topCards       = computed(() => data.value?.top_cards ?? [])
         </StatCard>
         <StatCard label="Prezzo medio" sub="Cardmarket" :icon="TrendingUp">
           <span v-if="kpi?.avg_price == null">—</span>
-          <span v-else>€ <AnimatedNumber :value="kpi.avg_price" :decimals="2" :duration="1200" /></span>
+          <span v-else
+            >€ <AnimatedNumber :value="kpi.avg_price" :decimals="2" :duration="1200"
+          /></span>
         </StatCard>
         <StatCard label="Carta più costosa" accent="warning" :icon="Gem">
           <span v-if="kpi?.max_price == null">—</span>
-          <span v-else>€ <AnimatedNumber :value="kpi.max_price" :decimals="2" :duration="1400" /></span>
+          <span v-else
+            >€ <AnimatedNumber :value="kpi.max_price" :decimals="2" :duration="1400"
+          /></span>
         </StatCard>
-        <StatCard label="Valore totale catalogo" accent="success" sub="somma prezzi Cardmarket" :icon="Wallet">
+        <StatCard
+          label="Valore totale catalogo"
+          accent="success"
+          sub="somma prezzi Cardmarket"
+          :icon="Wallet"
+        >
           <span v-if="kpi?.total_value == null">—</span>
-          <span v-else>€ <AnimatedNumber :value="kpi.total_value" :decimals="2" :duration="1600" /></span>
+          <span v-else
+            >€ <AnimatedNumber :value="kpi.total_value" :decimals="2" :duration="1600"
+          /></span>
         </StatCard>
       </div>
 
@@ -129,7 +147,6 @@ const topCards       = computed(() => data.value?.top_cards ?? [])
 
       <!-- Top 10 -->
       <TopCardsTable :cards="topCards" />
-
     </div>
   </AppPage>
 </template>

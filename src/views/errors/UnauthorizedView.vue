@@ -28,9 +28,7 @@ const sprite = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites
         Effettua il login o contatta un amministratore.
       </p>
       <div class="flex gap-3 justify-center">
-        <button class="btn btn-secondary btn-lg" @click="goToLogin">
-          Vai al login
-        </button>
+        <button class="btn btn-secondary btn-lg" @click="goToLogin">Vai al login</button>
         <button class="btn btn-ghost btn-lg" @click="router.back()">← Torna indietro</button>
       </div>
     </div>

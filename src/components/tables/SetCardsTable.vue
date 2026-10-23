@@ -13,10 +13,10 @@ const props = defineProps<{
   set: Set | null
 }>()
 
-const search         = ref('')
-const rarityFilter   = ref<string[]>([])
+const search = ref('')
+const rarityFilter = ref<string[]>([])
 const cardTypeFilter = ref<string[]>([])
-const energyFilter   = ref<string[]>([])
+const energyFilter = ref<string[]>([])
 
 const { data, isLoading, isFetching, refetch } = useQuery({
   queryKey: ['cards', computed(() => props.setId)],
@@ -41,7 +41,11 @@ const energyTypes = computed(() => {
 })
 
 const hasActiveFilters = computed(
-  () => rarityFilter.value.length > 0 || cardTypeFilter.value.length > 0 || energyFilter.value.length > 0 || !!search.value,
+  () =>
+    rarityFilter.value.length > 0 ||
+    cardTypeFilter.value.length > 0 ||
+    energyFilter.value.length > 0 ||
+    !!search.value,
 )
 
 function resetFilters() {
@@ -59,9 +63,12 @@ function cardName(card: Card): string {
 
 const filtered = computed(() => {
   let list = allCards.value
-  if (rarityFilter.value.length) list = list.filter((c) => c.rarity?.name && rarityFilter.value.includes(c.rarity.name))
-  if (cardTypeFilter.value.length) list = list.filter((c) => c.card_type?.name && cardTypeFilter.value.includes(c.card_type.name))
-  if (energyFilter.value.length) list = list.filter((c) => c.energy_types?.some((e) => energyFilter.value.includes(e)))
+  if (rarityFilter.value.length)
+    list = list.filter((c) => c.rarity?.name && rarityFilter.value.includes(c.rarity.name))
+  if (cardTypeFilter.value.length)
+    list = list.filter((c) => c.card_type?.name && cardTypeFilter.value.includes(c.card_type.name))
+  if (energyFilter.value.length)
+    list = list.filter((c) => c.energy_types?.some((e) => energyFilter.value.includes(e)))
   if (search.value) {
     const q = search.value.trim().toLowerCase()
     list = list.filter(
@@ -96,11 +103,32 @@ const filtered = computed(() => {
     </div>
 
     <!-- Filtri -->
-    <div class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-base-300 bg-base-200/30">
-      <FilterSelect v-model="rarityFilter" :options="rarities" placeholder="Tutte le rarità" multiple />
-      <FilterSelect v-model="cardTypeFilter" :options="cardTypes" placeholder="Tutti i tipi" multiple />
-      <FilterSelect v-model="energyFilter" :options="energyTypes" placeholder="Tutte le energie" multiple />
-      <button v-if="hasActiveFilters" class="btn btn-ghost btn-sm gap-1.5 text-base-content/50" @click="resetFilters">
+    <div
+      class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-base-300 bg-base-200/30"
+    >
+      <FilterSelect
+        v-model="rarityFilter"
+        :options="rarities"
+        placeholder="Tutte le rarità"
+        multiple
+      />
+      <FilterSelect
+        v-model="cardTypeFilter"
+        :options="cardTypes"
+        placeholder="Tutti i tipi"
+        multiple
+      />
+      <FilterSelect
+        v-model="energyFilter"
+        :options="energyTypes"
+        placeholder="Tutte le energie"
+        multiple
+      />
+      <button
+        v-if="hasActiveFilters"
+        class="btn btn-ghost btn-sm gap-1.5 text-base-content/50"
+        @click="resetFilters"
+      >
         <RotateCcw class="w-3.5 h-3.5" /> Ripristina
       </button>
       <div class="flex-1" />

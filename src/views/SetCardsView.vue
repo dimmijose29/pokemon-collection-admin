@@ -41,7 +41,9 @@ const subtitle = computed(() => {
         </button>
 
         <!-- Set logo box -->
-        <div class="bg-secondary/10 rounded-2xl px-3 py-2 shrink-0 flex items-center justify-center min-h-[3.5rem]">
+        <div
+          class="bg-secondary/10 rounded-2xl px-3 py-2 shrink-0 flex items-center justify-center min-h-[3.5rem]"
+        >
           <img
             v-if="set?.logo_url"
             :src="set.logo_url"

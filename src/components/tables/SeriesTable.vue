@@ -17,14 +17,14 @@ import { useToast } from '@/composables/useToast'
 import SeriesApi from '@/api/series'
 import type { Series } from '@/types/series'
 
-const modalStore  = useModalStore()
+const modalStore = useModalStore()
 const queryClient = useQueryClient()
-const router      = useRouter()
-const { show }    = useToast()
+const router = useRouter()
+const { show } = useToast()
 
-const search       = ref('')
+const search = ref('')
 const statusFilter = ref<StatusFilterValue>('active')
-const sort         = ref<SortState | null>(null)
+const sort = ref<SortState | null>(null)
 
 const { data, isLoading, isFetching, refetch } = useQuery({
   queryKey: ['series', { withTrashed: true }],
@@ -37,7 +37,7 @@ const allSeries = computed(() => data.value ?? [])
 
 const filtered = computed(() => {
   let list = allSeries.value
-  if (statusFilter.value === 'active')   list = list.filter((s) => !s.deleted_at)
+  if (statusFilter.value === 'active') list = list.filter((s) => !s.deleted_at)
   else if (statusFilter.value === 'deleted') list = list.filter((s) => !!s.deleted_at)
   return filterBySearch(list, search.value, {
     excludeKeys: ['deleted_at', 'logo_url'],
@@ -51,8 +51,12 @@ const sorted = computed(() => {
   const mult = direction === 'asc' ? 1 : -1
   return [...filtered.value].sort((a, b) => {
     if (field === 'sets_count') return ((a.sets_count ?? 0) - (b.sets_count ?? 0)) * mult
-    if (field === 'created_at') return (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * mult
-    return String(a[field as keyof Series] ?? '').localeCompare(String(b[field as keyof Series] ?? '')) * mult
+    if (field === 'created_at')
+      return (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * mult
+    return (
+      String(a[field as keyof Series] ?? '').localeCompare(String(b[field as keyof Series] ?? '')) *
+      mult
+    )
   })
 })
 
@@ -91,10 +95,33 @@ const isMutating = computed(() => isRemoving.value || isRestoring.value)
     <template #head>
       <tr>
         <th class="w-20"></th>
-        <SortableHeader field="name" label="Nome" :model-value="sort" @update:model-value="sort = $event" />
-        <SortableHeader field="tcgdex_id" label="TCGdex ID" :model-value="sort" class="hidden md:table-cell" @update:model-value="sort = $event" />
-        <SortableHeader field="sets_count" label="Set" :model-value="sort" class="hidden lg:table-cell w-20" @update:model-value="sort = $event" />
-        <SortableHeader field="created_at" label="Creata il" :model-value="sort" class="hidden lg:table-cell" @update:model-value="sort = $event" />
+        <SortableHeader
+          field="name"
+          label="Nome"
+          :model-value="sort"
+          @update:model-value="sort = $event"
+        />
+        <SortableHeader
+          field="tcgdex_id"
+          label="TCGdex ID"
+          :model-value="sort"
+          class="hidden md:table-cell"
+          @update:model-value="sort = $event"
+        />
+        <SortableHeader
+          field="sets_count"
+          label="Set"
+          :model-value="sort"
+          class="hidden lg:table-cell w-20"
+          @update:model-value="sort = $event"
+        />
+        <SortableHeader
+          field="created_at"
+          label="Creata il"
+          :model-value="sort"
+          class="hidden lg:table-cell"
+          @update:model-value="sort = $event"
+        />
         <th class="w-28"></th>
       </tr>
     </template>

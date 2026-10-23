@@ -21,18 +21,18 @@ export function getChartColors() {
   if (isDark) {
     // base-content dark: oklch(88% 0.02 240) ≈ rgb(210, 216, 232)
     return {
-      text:      'rgba(210, 216, 232, 0.90)',
+      text: 'rgba(210, 216, 232, 0.90)',
       textFaint: 'rgba(210, 216, 232, 0.40)',
-      grid:      'rgba(210, 216, 232, 0.09)',
-      bg:        'rgb(28, 32, 44)',           // base-100 dark
+      grid: 'rgba(210, 216, 232, 0.09)',
+      bg: 'rgb(28, 32, 44)', // base-100 dark
     }
   } else {
     // base-content light: oklch(20% 0.05 240) ≈ rgb(32, 38, 62)
     return {
-      text:      'rgba(32, 38, 62, 0.82)',
+      text: 'rgba(32, 38, 62, 0.82)',
       textFaint: 'rgba(32, 38, 62, 0.40)',
-      grid:      'rgba(32, 38, 62, 0.09)',
-      bg:        'rgb(245, 247, 252)',         // base-100 light
+      grid: 'rgba(32, 38, 62, 0.09)',
+      bg: 'rgb(245, 247, 252)', // base-100 light
     }
   }
 }

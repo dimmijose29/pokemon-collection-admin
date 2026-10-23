@@ -18,7 +18,9 @@ export function useUserEditModal() {
   watch(isOpen, (open) => {
     if (!open) {
       clearErrors()
-      setTimeout(() => { editingUser.value = null }, 300)
+      setTimeout(() => {
+        editingUser.value = null
+      }, 300)
     }
   })
 

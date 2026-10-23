@@ -32,7 +32,7 @@ describe('ArtistForm', () => {
     expect(wrapper.html()).toContain('Il nome è obbligatorio')
   })
 
-  it('pre-popola il campo con i dati dell\'artista in modalità edit', async () => {
+  it("pre-popola il campo con i dati dell'artista in modalità edit", async () => {
     const artist: Artist = {
       id: 1,
       name: 'Mitsuhiro Arita',

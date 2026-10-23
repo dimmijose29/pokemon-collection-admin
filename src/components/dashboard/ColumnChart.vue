@@ -21,15 +21,18 @@ const barColors = computed(() =>
   props.data.map((_, i) => {
     const n = props.data.length
     const t = n > 1 ? i / (n - 1) : 1
-    const l = (0.40 + t * 0.22).toFixed(2)
-    const c = (0.10 + t * 0.15).toFixed(2)
+    const l = (0.4 + t * 0.22).toFixed(2)
+    const c = (0.1 + t * 0.15).toFixed(2)
     return `oklch(${l} ${c} 265)`
   }),
 )
 
 function buildChart() {
   if (!canvasRef.value) return
-  if (chart) { chart.destroy(); chart = null }
+  if (chart) {
+    chart.destroy()
+    chart = null
+  }
 
   const { text, textFaint, grid } = getChartColors()
 
@@ -37,13 +40,15 @@ function buildChart() {
     type: 'bar',
     data: {
       labels: props.data.map((i) => i.label),
-      datasets: [{
-        data: props.data.map((i) => i.value),
-        backgroundColor: barColors.value.map((c) => c.replace(')', ' / 0.80)')),
-        hoverBackgroundColor: barColors.value,
-        borderRadius: 4,
-        borderSkipped: false,
-      }],
+      datasets: [
+        {
+          data: props.data.map((i) => i.value),
+          backgroundColor: barColors.value.map((c) => c.replace(')', ' / 0.80)')),
+          hoverBackgroundColor: barColors.value,
+          borderRadius: 4,
+          borderSkipped: false,
+        },
+      ],
     },
     options: {
       responsive: true,

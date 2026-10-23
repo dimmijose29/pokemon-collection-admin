@@ -17,8 +17,7 @@ function submit() {
 <template>
   <div class="flex flex-col gap-3">
     <p class="text-sm text-base-content/70">
-      Inserisci la tua password e il codice dall'app authenticator per confermare la
-      disattivazione.
+      Inserisci la tua password e il codice dall'app authenticator per confermare la disattivazione.
     </p>
 
     <div class="flex items-end gap-2 flex-wrap">

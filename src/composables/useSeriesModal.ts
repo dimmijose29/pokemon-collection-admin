@@ -7,15 +7,17 @@ import SeriesApi from '@/api/series'
 import type { Series, SeriesPayload } from '@/types/series'
 
 export function useSeriesModal() {
-  const modalStore  = useModalStore()
+  const modalStore = useModalStore()
   const queryClient = useQueryClient()
-  const loading     = ref(false)
+  const loading = ref(false)
   const { setErrors, clearErrors, allErrors } = useErrorList()
   const { show } = useToast()
 
   watch(
     () => modalStore.isOpen,
-    (open) => { if (!open) clearErrors() },
+    (open) => {
+      if (!open) clearErrors()
+    },
   )
 
   async function handleSubmit(data: Record<string, unknown>) {
@@ -23,9 +25,9 @@ export function useSeriesModal() {
     clearErrors()
     try {
       const payload: SeriesPayload = {
-        name:      data.name as string,
+        name: data.name as string,
         tcgdex_id: (data.tcgdex_id as string) || null,
-        logo_url:  (data.logo_url  as string) || null,
+        logo_url: (data.logo_url as string) || null,
       }
       if (modalStore.mode === 'create') {
         await SeriesApi.create(payload)

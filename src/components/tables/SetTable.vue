@@ -22,7 +22,7 @@ const modalStore = useModalStore()
 const queryClient = useQueryClient()
 const { show } = useToast()
 const router = useRouter()
-const route  = useRoute()
+const route = useRoute()
 
 const search = ref('')
 const statusFilter = ref<StatusFilterValue>('active')
@@ -98,14 +98,19 @@ const sortedSets = computed(() => {
   const { field, direction } = sort.value
   const mult = direction === 'asc' ? 1 : -1
   return [...sets.value].sort((a, b) => {
-    if (field === 'card_count_official') return ((a.card_count_official ?? 0) - (b.card_count_official ?? 0)) * mult
+    if (field === 'card_count_official')
+      return ((a.card_count_official ?? 0) - (b.card_count_official ?? 0)) * mult
     if (field === 'release_date') {
       const aD = a.release_date ? new Date(a.release_date).getTime() : 0
       const bD = b.release_date ? new Date(b.release_date).getTime() : 0
       return (aD - bD) * mult
     }
     if (field === 'series') return (a.series?.name ?? '').localeCompare(b.series?.name ?? '') * mult
-    return String(a[field as keyof typeof a] ?? '').localeCompare(String(b[field as keyof typeof b] ?? '')) * mult
+    return (
+      String(a[field as keyof typeof a] ?? '').localeCompare(
+        String(b[field as keyof typeof b] ?? ''),
+      ) * mult
+    )
   })
 })
 </script>
@@ -132,10 +137,33 @@ const sortedSets = computed(() => {
     <template #head>
       <tr>
         <th class="w-20"></th>
-        <SortableHeader field="name" label="Nome" :model-value="sort" @update:model-value="sort = $event" />
-        <SortableHeader field="series" label="Serie" :model-value="sort" class="hidden md:table-cell" @update:model-value="sort = $event" />
-        <SortableHeader field="card_count_official" label="Carte" :model-value="sort" class="hidden lg:table-cell w-24" @update:model-value="sort = $event" />
-        <SortableHeader field="release_date" label="Uscita" :model-value="sort" class="hidden lg:table-cell" @update:model-value="sort = $event" />
+        <SortableHeader
+          field="name"
+          label="Nome"
+          :model-value="sort"
+          @update:model-value="sort = $event"
+        />
+        <SortableHeader
+          field="series"
+          label="Serie"
+          :model-value="sort"
+          class="hidden md:table-cell"
+          @update:model-value="sort = $event"
+        />
+        <SortableHeader
+          field="card_count_official"
+          label="Carte"
+          :model-value="sort"
+          class="hidden lg:table-cell w-24"
+          @update:model-value="sort = $event"
+        />
+        <SortableHeader
+          field="release_date"
+          label="Uscita"
+          :model-value="sort"
+          class="hidden lg:table-cell"
+          @update:model-value="sort = $event"
+        />
         <th class="w-28"></th>
       </tr>
     </template>

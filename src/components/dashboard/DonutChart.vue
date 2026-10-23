@@ -8,16 +8,16 @@ import type { ChartPoint } from '@/types/stats'
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend)
 
 const PALETTE = [
-  'oklch(0.75 0.18 85)',   // amber
-  'oklch(0.55 0.22 265)',  // blue
-  'oklch(0.65 0.18 155)',  // green
-  'oklch(0.60 0.22 15)',   // red
-  'oklch(0.60 0.20 300)',  // purple
-  'oklch(0.65 0.18 200)',  // cyan
-  'oklch(0.68 0.18 50)',   // orange
-  'oklch(0.65 0.18 340)',  // pink
-  'oklch(0.70 0.16 130)',  // lime
-  'oklch(0.55 0.05 265)',  // slate
+  'oklch(0.75 0.18 85)', // amber
+  'oklch(0.55 0.22 265)', // blue
+  'oklch(0.65 0.18 155)', // green
+  'oklch(0.60 0.22 15)', // red
+  'oklch(0.60 0.20 300)', // purple
+  'oklch(0.65 0.18 200)', // cyan
+  'oklch(0.68 0.18 50)', // orange
+  'oklch(0.65 0.18 340)', // pink
+  'oklch(0.70 0.16 130)', // lime
+  'oklch(0.55 0.05 265)', // slate
 ]
 
 const props = defineProps<{
@@ -36,7 +36,10 @@ function items() {
 
 function buildChart() {
   if (!canvasRef.value) return
-  if (chart) { chart.destroy(); chart = null }
+  if (chart) {
+    chart.destroy()
+    chart = null
+  }
 
   const d = items()
   const { text, bg } = getChartColors()
@@ -45,19 +48,26 @@ function buildChart() {
     type: 'doughnut',
     data: {
       labels: d.map((i) => i.label),
-      datasets: [{
-        data: d.map((i) => i.value),
-        backgroundColor: PALETTE.slice(0, d.length),
-        hoverOffset: 8,
-        borderWidth: 3,
-        borderColor: bg,
-      }],
+      datasets: [
+        {
+          data: d.map((i) => i.value),
+          backgroundColor: PALETTE.slice(0, d.length),
+          hoverOffset: 8,
+          borderWidth: 3,
+          borderColor: bg,
+        },
+      ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       cutout: '65%',
-      animation: { animateRotate: true, animateScale: false, duration: 900, easing: 'easeOutQuart' },
+      animation: {
+        animateRotate: true,
+        animateScale: false,
+        duration: 900,
+        easing: 'easeOutQuart',
+      },
       plugins: {
         legend: {
           position: 'right',

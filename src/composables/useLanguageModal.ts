@@ -16,7 +16,9 @@ export function useLanguageModal() {
   // Pulisce gli errori quando la modale viene chiusa
   watch(
     () => modalStore.isOpen,
-    (open) => { if (!open) clearErrors() },
+    (open) => {
+      if (!open) clearErrors()
+    },
   )
 
   async function handleSubmit(data: Record<string, unknown>) {
@@ -28,7 +30,10 @@ export function useLanguageModal() {
         show('Lingua creata con successo')
       } else {
         const language = modalStore.currentData as Language
-        await Languages.update(language.id, data as { code: string; name: string; country_code: string })
+        await Languages.update(
+          language.id,
+          data as { code: string; name: string; country_code: string },
+        )
         show('Lingua aggiornata con successo')
       }
       await queryClient.invalidateQueries({ queryKey: ['languages'] })

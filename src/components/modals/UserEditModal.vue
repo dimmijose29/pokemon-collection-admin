@@ -25,12 +25,7 @@ const emit = defineEmits<{
     :loading="loading"
     @update:model-value="emit('update:modelValue', $event)"
   >
-    <UserEditForm
-      v-if="user"
-      :user="user"
-      :errors="errors"
-      @submit="emit('submit', $event)"
-    />
+    <UserEditForm v-if="user" :user="user" :errors="errors" @submit="emit('submit', $event)" />
 
     <template #footer>
       <button

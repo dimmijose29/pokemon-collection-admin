@@ -8,21 +8,21 @@ import type { ChartPoint } from '@/types/stats'
 Chart.register(BarController, CategoryScale, LinearScale, BarElement, Tooltip)
 
 const PALETTE = [
-  'oklch(0.75 0.18 85)',   // amber
-  'oklch(0.55 0.22 265)',  // blue
-  'oklch(0.65 0.18 155)',  // green
-  'oklch(0.60 0.22 15)',   // red
-  'oklch(0.60 0.20 300)',  // purple
-  'oklch(0.65 0.18 200)',  // cyan
-  'oklch(0.68 0.18 50)',   // orange
-  'oklch(0.65 0.18 340)',  // pink
-  'oklch(0.70 0.16 130)',  // lime
-  'oklch(0.58 0.05 265)',  // slate
-  'oklch(0.72 0.15 100)',  // yellow-green
-  'oklch(0.62 0.20 240)',  // indigo
-  'oklch(0.67 0.18 180)',  // teal
-  'oklch(0.58 0.18 330)',  // rose
-  'oklch(0.70 0.15 70)',   // gold
+  'oklch(0.75 0.18 85)', // amber
+  'oklch(0.55 0.22 265)', // blue
+  'oklch(0.65 0.18 155)', // green
+  'oklch(0.60 0.22 15)', // red
+  'oklch(0.60 0.20 300)', // purple
+  'oklch(0.65 0.18 200)', // cyan
+  'oklch(0.68 0.18 50)', // orange
+  'oklch(0.65 0.18 340)', // pink
+  'oklch(0.70 0.16 130)', // lime
+  'oklch(0.58 0.05 265)', // slate
+  'oklch(0.72 0.15 100)', // yellow-green
+  'oklch(0.62 0.20 240)', // indigo
+  'oklch(0.67 0.18 180)', // teal
+  'oklch(0.58 0.18 330)', // rose
+  'oklch(0.70 0.15 70)', // gold
 ]
 
 // Il modulo garantisce un indice valido; `!` serve per noUncheckedIndexedAccess
@@ -45,7 +45,10 @@ function items() {
 
 function buildChart() {
   if (!canvasRef.value) return
-  if (chart) { chart.destroy(); chart = null }
+  if (chart) {
+    chart.destroy()
+    chart = null
+  }
 
   const d = items()
   const { text, textFaint, grid } = getChartColors()
@@ -54,13 +57,15 @@ function buildChart() {
     type: 'bar',
     data: {
       labels: d.map((i) => i.label),
-      datasets: [{
-        data: d.map((i) => i.value),
-        backgroundColor: d.map((_, i) => paletteColor(i).replace(')', ' / 0.82)')),
-        hoverBackgroundColor: d.map((_, i) => paletteColor(i)),
-        borderRadius: 5,
-        borderSkipped: false,
-      }],
+      datasets: [
+        {
+          data: d.map((i) => i.value),
+          backgroundColor: d.map((_, i) => paletteColor(i).replace(')', ' / 0.82)')),
+          hoverBackgroundColor: d.map((_, i) => paletteColor(i)),
+          borderRadius: 5,
+          borderSkipped: false,
+        },
+      ],
     },
     options: {
       indexAxis: 'y',
@@ -74,7 +79,10 @@ function buildChart() {
           callbacks: {
             label: (ctx) => {
               const value = ctx.parsed.x ?? 0
-              return '  ' + (props.formatValue ? props.formatValue(value) : value.toLocaleString('it-IT'))
+              return (
+                '  ' +
+                (props.formatValue ? props.formatValue(value) : value.toLocaleString('it-IT'))
+              )
             },
           },
         },

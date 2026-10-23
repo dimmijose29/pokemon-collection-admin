@@ -11,7 +11,9 @@ const modalStore = useModalStore()
 const { handleSubmit, loading, allErrors } = useConditionModal()
 
 const currentCondition = computed(() => modalStore.currentData as Condition | null)
-const title = computed(() => (modalStore.mode === 'create' ? 'Nuova condizione' : 'Modifica condizione'))
+const title = computed(() =>
+  modalStore.mode === 'create' ? 'Nuova condizione' : 'Modifica condizione',
+)
 const btnClass = computed(() => (modalStore.mode === 'create' ? 'btn-secondary' : 'btn-success'))
 </script>
 

@@ -8,7 +8,4 @@ import { MotionPlugin } from '@vueuse/motion'
  * - FormKit: necessario per montare qualsiasi componente che usa <FormKit>
  * - MotionPlugin: necessario per la direttiva v-motion-pop usata in ErrorAlert
  */
-config.global.plugins = [
-  [formkit, defaultConfig],
-  MotionPlugin,
-]
+config.global.plugins = [[formkit, defaultConfig], MotionPlugin]

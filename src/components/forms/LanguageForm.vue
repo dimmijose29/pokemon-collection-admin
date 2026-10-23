@@ -19,7 +19,11 @@ const emit = defineEmits<{
     type="form"
     id="language-form"
     :actions="false"
-    :value="language ? { code: language.code, name: language.name, country_code: language.country_code } : undefined"
+    :value="
+      language
+        ? { code: language.code, name: language.name, country_code: language.country_code }
+        : undefined
+    "
     @submit="(data) => emit('submit', data)"
   >
     <!-- Codice lingua ISO 639-1, es. en, it, jp -->

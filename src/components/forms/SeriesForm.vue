@@ -19,7 +19,11 @@ const emit = defineEmits<{
     type="form"
     id="series-form"
     :actions="false"
-    :value="series ? { name: series.name, tcgdex_id: series.tcgdex_id ?? '', logo_url: series.logo_url ?? '' } : undefined"
+    :value="
+      series
+        ? { name: series.name, tcgdex_id: series.tcgdex_id ?? '', logo_url: series.logo_url ?? '' }
+        : undefined
+    "
     @submit="(data) => emit('submit', data)"
   >
     <FormKit

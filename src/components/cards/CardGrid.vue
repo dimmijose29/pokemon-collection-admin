@@ -56,9 +56,7 @@ function openCard(card: Card) {
 <template>
   <div>
     <!-- Toolbar layout -->
-    <div
-      class="flex items-center justify-between px-4 py-2.5 border-b border-base-300"
-    >
+    <div class="flex items-center justify-between px-4 py-2.5 border-b border-base-300">
       <span class="text-sm text-base-content/50">
         {{ sorted.length.toLocaleString('it-IT') }} {{ sorted.length === 1 ? 'carta' : 'carte' }}
       </span>

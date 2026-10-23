@@ -15,8 +15,8 @@ function hideOnError(e: Event) {
 }
 
 // Modale dettaglio carta — carica il Card completo dall'API al click
-const detailOpen    = ref(false)
-const selectedCard  = ref<Card | null>(null)
+const detailOpen = ref(false)
+const selectedCard = ref<Card | null>(null)
 const loadingCardId = ref<number | null>(null)
 
 async function openCard(card: StatsTopCard) {
@@ -41,7 +41,9 @@ async function openCard(card: StatsTopCard) {
       <div class="overflow-x-auto">
         <table class="table table-sm w-full">
           <thead>
-            <tr class="text-base-content/40 text-xs uppercase tracking-wider border-b border-base-200">
+            <tr
+              class="text-base-content/40 text-xs uppercase tracking-wider border-b border-base-200"
+            >
               <th class="w-8 font-normal pb-2">#</th>
               <th class="w-12 font-normal pb-2"></th>
               <th class="font-normal pb-2">Carta</th>
@@ -59,8 +61,13 @@ async function openCard(card: StatsTopCard) {
             >
               <td class="text-base-content/25 font-mono text-xs w-8">{{ i + 1 }}</td>
               <td class="p-1.5 w-12">
-                <div class="w-9 h-12 rounded-md overflow-hidden bg-base-200 shrink-0 flex items-center justify-center">
-                  <span v-if="loadingCardId === card.id" class="loading loading-spinner loading-xs text-secondary" />
+                <div
+                  class="w-9 h-12 rounded-md overflow-hidden bg-base-200 shrink-0 flex items-center justify-center"
+                >
+                  <span
+                    v-if="loadingCardId === card.id"
+                    class="loading loading-spinner loading-xs text-secondary"
+                  />
                   <img
                     v-else-if="card.image_url"
                     :src="card.image_url + '/low.webp'"
@@ -84,11 +91,15 @@ async function openCard(card: StatsTopCard) {
                     class="h-5 max-w-[4.5rem] object-contain opacity-75"
                     @error="hideOnError"
                   />
-                  <span class="text-xs text-base-content/50 truncate max-w-[10rem]">{{ card.set_name }}</span>
+                  <span class="text-xs text-base-content/50 truncate max-w-[10rem]">{{
+                    card.set_name
+                  }}</span>
                 </div>
               </td>
               <td class="text-right">
-                <span class="font-bold font-mono text-success text-sm">€ {{ card.price.toFixed(2) }}</span>
+                <span class="font-bold font-mono text-success text-sm"
+                  >€ {{ card.price.toFixed(2) }}</span
+                >
               </td>
             </tr>
             <tr v-if="!cards.length">

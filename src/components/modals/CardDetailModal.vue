@@ -78,7 +78,10 @@ function seriesName(s: { name: string } | string | null | undefined): string | n
       leave-active-class="transition-opacity duration-200"
       leave-to-class="opacity-0"
     >
-      <div v-if="modelValue && card" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6">
+      <div
+        v-if="modelValue && card"
+        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
+      >
         <!-- Backdrop -->
         <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="close" />
 
@@ -94,7 +97,9 @@ function seriesName(s: { name: string } | string | null | undefined): string | n
             class="relative bg-base-100 rounded-3xl shadow-2xl z-10 w-full max-w-5xl max-h-[94vh] overflow-hidden flex flex-col"
           >
             <!-- Header espansione -->
-            <div class="relative flex items-center justify-between px-6 py-4 border-b border-base-300 bg-base-200/60 shrink-0">
+            <div
+              class="relative flex items-center justify-between px-6 py-4 border-b border-base-300 bg-base-200/60 shrink-0"
+            >
               <!-- Info espansione -->
               <div class="flex items-center gap-3 min-w-0">
                 <img
@@ -109,7 +114,9 @@ function seriesName(s: { name: string } | string | null | undefined): string | n
                   <!-- Nome set cliccabile -->
                   <div
                     class="font-semibold text-sm text-base-content/80 truncate flex items-center gap-1"
-                    :class="setInfo.id ? 'cursor-pointer hover:text-secondary transition-colors' : ''"
+                    :class="
+                      setInfo.id ? 'cursor-pointer hover:text-secondary transition-colors' : ''
+                    "
                     @click="setInfo.id && goToSet()"
                   >
                     {{ setInfo.name }}
@@ -119,11 +126,18 @@ function seriesName(s: { name: string } | string | null | undefined): string | n
                   <div class="text-xs text-base-content/40 flex items-center gap-1.5">
                     <span
                       v-if="seriesName(setInfo.series)"
-                      :class="seriesName(setInfo.series) ? 'cursor-pointer hover:text-secondary transition-colors' : ''"
+                      :class="
+                        seriesName(setInfo.series)
+                          ? 'cursor-pointer hover:text-secondary transition-colors'
+                          : ''
+                      "
                       @click="goToSeries()"
-                    >{{ seriesName(setInfo.series) }}</span>
+                      >{{ seriesName(setInfo.series) }}</span
+                    >
                     <span v-if="seriesName(setInfo.series) && setInfo.release_date">·</span>
-                    <span v-if="setInfo.release_date">{{ setInfo.release_date.substring(0, 4) }}</span>
+                    <span v-if="setInfo.release_date">{{
+                      setInfo.release_date.substring(0, 4)
+                    }}</span>
                   </div>
                 </div>
               </div>
@@ -135,14 +149,15 @@ function seriesName(s: { name: string } | string | null | undefined): string | n
             <!-- Body scrollabile -->
             <div class="overflow-y-auto flex-1">
               <div class="p-6 flex flex-col md:flex-row gap-8">
-
                 <!-- Colonna sinistra: carta 3D — larghezza fissa generosa -->
                 <div class="shrink-0 flex flex-col items-center gap-4 md:w-72">
                   <Card3DViewer :image-url="card.image_url" :alt="name" max-width="280px" />
 
                   <!-- Prezzo sotto la carta (visibile solo su mobile) -->
                   <div class="md:hidden w-full">
-                    <div class="bg-base-200 rounded-2xl px-4 py-3 flex items-center justify-between">
+                    <div
+                      class="bg-base-200 rounded-2xl px-4 py-3 flex items-center justify-between"
+                    >
                       <div class="flex items-center gap-2 text-sm text-base-content/60">
                         <TrendingUp class="w-4 h-4" />
                         Cardmarket
@@ -159,17 +174,20 @@ function seriesName(s: { name: string } | string | null | undefined): string | n
 
                 <!-- Colonna destra: info -->
                 <div class="flex-1 min-w-0 space-y-5">
-
                   <!-- Nome carta + codice -->
                   <div>
-                    <h2 class="font-heading font-bold text-2xl text-base-content leading-tight">{{ name }}</h2>
+                    <h2 class="font-heading font-bold text-2xl text-base-content leading-tight">
+                      {{ name }}
+                    </h2>
                     <p class="text-base-content/40 text-sm font-mono mt-0.5">
                       #{{ card.local_id }} · {{ card.tcgdex_id }}
                     </p>
                   </div>
 
                   <!-- Prezzo (desktop) -->
-                  <div class="hidden md:flex bg-gradient-to-r from-success/10 to-base-200 rounded-2xl px-5 py-4 items-center justify-between border border-success/20">
+                  <div
+                    class="hidden md:flex bg-gradient-to-r from-success/10 to-base-200 rounded-2xl px-5 py-4 items-center justify-between border border-success/20"
+                  >
                     <div class="flex items-center gap-2 text-base-content/60">
                       <TrendingUp class="w-4 h-4 text-success" />
                       <span class="text-sm">Prezzo Cardmarket</span>
@@ -188,35 +206,46 @@ function seriesName(s: { name: string } | string | null | undefined): string | n
                       v-if="card.card_type"
                       class="badge badge-sm font-medium"
                       :class="getCardTypeClass(card.card_type.name)"
-                    >{{ card.card_type.name }}</span>
+                      >{{ card.card_type.name }}</span
+                    >
                     <span
                       v-if="card.stage"
                       class="badge badge-sm"
                       :class="getStageClass(card.stage)"
-                    >{{ card.stage }}</span>
+                      >{{ card.stage }}</span
+                    >
                     <span
                       v-for="e in card.energy_types"
                       :key="e"
                       class="badge badge-sm border"
                       :style="getEnergyStyle(e)"
-                    >{{ e }}</span>
+                      >{{ e }}</span
+                    >
                   </div>
 
                   <!-- Dettagli tabella -->
                   <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                     <div v-if="card.rarity" class="flex flex-col gap-0.5">
-                      <span class="text-base-content/40 text-xs uppercase tracking-wider">Rarità</span>
+                      <span class="text-base-content/40 text-xs uppercase tracking-wider"
+                        >Rarità</span
+                      >
                       <span class="font-medium">{{ card.rarity.name }}</span>
                     </div>
                     <div v-if="card.artist" class="flex flex-col gap-0.5">
-                      <span class="text-base-content/40 text-xs uppercase tracking-wider">Artista</span>
+                      <span class="text-base-content/40 text-xs uppercase tracking-wider"
+                        >Artista</span
+                      >
                       <span class="font-medium">{{ card.artist.name }}</span>
                     </div>
                     <div v-if="setInfo" class="flex flex-col gap-0.5">
-                      <span class="text-base-content/40 text-xs uppercase tracking-wider">Espansione</span>
+                      <span class="text-base-content/40 text-xs uppercase tracking-wider"
+                        >Espansione</span
+                      >
                       <span
                         class="font-medium flex items-center gap-1"
-                        :class="setInfo.id ? 'cursor-pointer hover:text-secondary transition-colors' : ''"
+                        :class="
+                          setInfo.id ? 'cursor-pointer hover:text-secondary transition-colors' : ''
+                        "
                         @click="setInfo?.id && goToSet()"
                       >
                         {{ setInfo.name }}
@@ -224,7 +253,9 @@ function seriesName(s: { name: string } | string | null | undefined): string | n
                       </span>
                     </div>
                     <div v-if="seriesName(setInfo?.series)" class="flex flex-col gap-0.5">
-                      <span class="text-base-content/40 text-xs uppercase tracking-wider">Serie</span>
+                      <span class="text-base-content/40 text-xs uppercase tracking-wider"
+                        >Serie</span
+                      >
                       <span
                         class="font-medium flex items-center gap-1 cursor-pointer hover:text-secondary transition-colors"
                         @click="goToSeries()"
@@ -244,7 +275,9 @@ function seriesName(s: { name: string } | string | null | undefined): string | n
                         :key="t.id"
                         class="text-xs bg-base-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5"
                       >
-                        <span class="text-base-content/40 font-mono uppercase text-[10px]">{{ t.language?.code }}</span>
+                        <span class="text-base-content/40 font-mono uppercase text-[10px]">{{
+                          t.language?.code
+                        }}</span>
                         <span class="font-medium">{{ t.name }}</span>
                       </span>
                     </div>

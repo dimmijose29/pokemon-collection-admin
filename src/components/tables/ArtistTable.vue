@@ -79,8 +79,13 @@ const sortedArtists = computed(() => {
   const { field, direction } = sort.value
   const mult = direction === 'asc' ? 1 : -1
   return [...artists.value].sort((a, b) => {
-    if (field === 'created_at') return (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * mult
-    return String(a[field as keyof typeof a] ?? '').localeCompare(String(b[field as keyof typeof b] ?? '')) * mult
+    if (field === 'created_at')
+      return (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * mult
+    return (
+      String(a[field as keyof typeof a] ?? '').localeCompare(
+        String(b[field as keyof typeof b] ?? ''),
+      ) * mult
+    )
   })
 })
 </script>
@@ -100,8 +105,18 @@ const sortedArtists = computed(() => {
 
     <template #head>
       <tr>
-        <SortableHeader field="name" label="Nome" :model-value="sort" @update:model-value="sort = $event" />
-        <SortableHeader field="created_at" label="Creato il" :model-value="sort" @update:model-value="sort = $event" />
+        <SortableHeader
+          field="name"
+          label="Nome"
+          :model-value="sort"
+          @update:model-value="sort = $event"
+        />
+        <SortableHeader
+          field="created_at"
+          label="Creato il"
+          :model-value="sort"
+          @update:model-value="sort = $event"
+        />
         <th class="w-24"></th>
       </tr>
     </template>

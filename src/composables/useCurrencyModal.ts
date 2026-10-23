@@ -16,7 +16,9 @@ export function useCurrencyModal() {
   // Pulisce gli errori quando la modale viene chiusa
   watch(
     () => modalStore.isOpen,
-    (open) => { if (!open) clearErrors() },
+    (open) => {
+      if (!open) clearErrors()
+    },
   )
 
   async function handleSubmit(data: Record<string, unknown>) {

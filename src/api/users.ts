@@ -7,7 +7,12 @@ const Users = {
     return response.data
   },
 
-  create: async (data: { email: string; username: string; password: string; is_admin?: boolean }): Promise<User> => {
+  create: async (data: {
+    email: string
+    username: string
+    password: string
+    is_admin?: boolean
+  }): Promise<User> => {
     const response = await https.post('/users', data)
     return response.data
   },

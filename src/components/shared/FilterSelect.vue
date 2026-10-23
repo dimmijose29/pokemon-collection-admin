@@ -10,8 +10,8 @@ const props = defineProps<{
 
 const model = defineModel<string | string[] | null>()
 
-const isOpen       = ref(false)
-const searchQuery  = ref('')
+const isOpen = ref(false)
+const searchQuery = ref('')
 const containerRef = ref<HTMLElement | null>(null)
 
 const selectedValues = computed<string[]>(() => {
@@ -135,8 +135,19 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onClickOutside))
               class="w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors"
               :class="isSelected(option) ? 'bg-secondary border-secondary' : 'border-base-300'"
             >
-              <svg v-if="isSelected(option)" class="w-2.5 h-2.5 text-secondary-content" fill="none" viewBox="0 0 10 8">
-                <path d="M1 4l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg
+                v-if="isSelected(option)"
+                class="w-2.5 h-2.5 text-secondary-content"
+                fill="none"
+                viewBox="0 0 10 8"
+              >
+                <path
+                  d="M1 4l3 3 5-5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </span>
             <span
@@ -149,7 +160,10 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onClickOutside))
             {{ option }}
           </button>
 
-          <div v-if="filteredOptions.length === 0" class="px-3 py-3 text-xs text-base-content/40 text-center">
+          <div
+            v-if="filteredOptions.length === 0"
+            class="px-3 py-3 text-xs text-base-content/40 text-center"
+          >
             Nessun risultato
           </div>
         </div>

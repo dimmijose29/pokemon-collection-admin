@@ -20,14 +20,17 @@ const bio = ref(props.user.bio ?? '')
 const avatarFile = ref<File | null>(null)
 const avatarPreview = ref<string | null>(props.user.avatar_url ?? null)
 
-watch(() => props.user, (u) => {
-  username.value = u.username
-  isAdmin.value = u.is_admin
-  country.value = u.country ?? ''
-  bio.value = u.bio ?? ''
-  avatarPreview.value = u.avatar_url ?? null
-  avatarFile.value = null
-})
+watch(
+  () => props.user,
+  (u) => {
+    username.value = u.username
+    isAdmin.value = u.is_admin
+    country.value = u.country ?? ''
+    bio.value = u.bio ?? ''
+    avatarPreview.value = u.avatar_url ?? null
+    avatarFile.value = null
+  },
+)
 
 function onFileChange(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
@@ -69,7 +72,12 @@ function handleSubmit() {
     <div class="flex items-center gap-4">
       <div class="avatar placeholder shrink-0">
         <div class="bg-neutral text-neutral-content rounded-full w-16 overflow-hidden">
-          <img v-if="avatarPreview" :src="avatarPreview" alt="Avatar" class="w-full h-full object-cover" />
+          <img
+            v-if="avatarPreview"
+            :src="avatarPreview"
+            alt="Avatar"
+            class="w-full h-full object-cover"
+          />
           <span v-else class="text-xl">{{ user.username.charAt(0).toUpperCase() }}</span>
         </div>
       </div>
@@ -79,7 +87,12 @@ function handleSubmit() {
           <label class="btn btn-sm btn-ghost gap-1 cursor-pointer">
             <Upload class="w-3.5 h-3.5" />
             Scegli file
-            <input type="file" class="hidden" accept="image/jpeg,image/png,image/webp" @change="onFileChange" />
+            <input
+              type="file"
+              class="hidden"
+              accept="image/jpeg,image/png,image/webp"
+              @change="onFileChange"
+            />
           </label>
           <button v-if="avatarFile" type="button" class="btn btn-ghost btn-xs" @click="clearAvatar">
             <X class="w-3.5 h-3.5" /> Annulla

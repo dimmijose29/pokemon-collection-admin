@@ -16,11 +16,11 @@ describe('parseErrors', () => {
     expect(parseErrors('Qualcosa è andato storto')).toEqual(['Qualcosa è andato storto'])
   })
 
-  it('restituisce l\'array filtrato se viene passato un array', () => {
+  it("restituisce l'array filtrato se viene passato un array", () => {
     expect(parseErrors(['Errore A', 'Errore B'])).toEqual(['Errore A', 'Errore B'])
   })
 
-  it('filtra i valori falsy dall\'array', () => {
+  it("filtra i valori falsy dall'array", () => {
     expect(parseErrors(['Errore A', '', null, 'Errore B'])).toEqual(['Errore A', 'Errore B'])
   })
 

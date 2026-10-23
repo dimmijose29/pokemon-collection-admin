@@ -11,48 +11,67 @@ import Sets from '@/api/sets'
 import { getCardTypeClass, getEnergyStyle } from '@/utils/pokemon'
 
 // --- Filtri (valori form) ---
-const fName       = ref('')
-const fSeriesId   = ref<number | null>(null)
-const fSetId      = ref<number | null>(null)
-const fRarityId   = ref<number | null>(null)
+const fName = ref('')
+const fSeriesId = ref<number | null>(null)
+const fSetId = ref<number | null>(null)
+const fRarityId = ref<number | null>(null)
 const fCardTypeId = ref<number | null>(null)
-const fStage      = ref<string | null>(null)
+const fStage = ref<string | null>(null)
 const fEnergyType = ref<string | null>(null)
-const fHasPrice   = ref(false)
+const fHasPrice = ref(false)
 
 // --- Filtri attivi (applicati dopo "Cerca") ---
 const activeParams = ref<CardSearchParams | null>(null)
-const page         = ref(1)
-const filtersOpen  = ref(true)
+const page = ref(1)
+const filtersOpen = ref(true)
 
 // Reset pagina se i parametri cambiano
-watch(activeParams, () => { page.value = 1 })
+watch(activeParams, () => {
+  page.value = 1
+})
 
-const hasActiveFilters = computed(() =>
-  !!fName.value || !!fSeriesId.value || !!fSetId.value || !!fRarityId.value ||
-  !!fCardTypeId.value || !!fStage.value || !!fEnergyType.value || fHasPrice.value
+const hasActiveFilters = computed(
+  () =>
+    !!fName.value ||
+    !!fSeriesId.value ||
+    !!fSetId.value ||
+    !!fRarityId.value ||
+    !!fCardTypeId.value ||
+    !!fStage.value ||
+    !!fEnergyType.value ||
+    fHasPrice.value,
 )
 
-const activeFilterCount = computed(() =>
-  [fName.value, fSeriesId.value, fSetId.value, fRarityId.value,
-   fCardTypeId.value, fStage.value, fEnergyType.value, fHasPrice.value ? 1 : 0]
-    .filter(Boolean).length
+const activeFilterCount = computed(
+  () =>
+    [
+      fName.value,
+      fSeriesId.value,
+      fSetId.value,
+      fRarityId.value,
+      fCardTypeId.value,
+      fStage.value,
+      fEnergyType.value,
+      fHasPrice.value ? 1 : 0,
+    ].filter(Boolean).length,
 )
 
 // Reset set quando cambia serie
-watch(fSeriesId, () => { fSetId.value = null })
+watch(fSeriesId, () => {
+  fSetId.value = null
+})
 
 // --- Cerca ---
 function cerca() {
   activeParams.value = {
-    name:         fName.value || null,
-    series_id:    fSeriesId.value,
-    set_id:       fSetId.value,
-    rarity_id:    fRarityId.value,
+    name: fName.value || null,
+    series_id: fSeriesId.value,
+    set_id: fSetId.value,
+    rarity_id: fRarityId.value,
     card_type_id: fCardTypeId.value,
-    stage:        fStage.value,
-    energy_type:  fEnergyType.value,
-    has_price:    fHasPrice.value || undefined,
+    stage: fStage.value,
+    energy_type: fEnergyType.value,
+    has_price: fHasPrice.value || undefined,
   }
 }
 
@@ -91,8 +110,16 @@ const filteredSets = computed(() => {
 
 // Rarità e tipi: estratti dai dati series/set già caricati — oppure hardcoded
 const ENERGY_TYPES = [
-  'Grass', 'Fire', 'Water', 'Lightning', 'Psychic',
-  'Fighting', 'Darkness', 'Metal', 'Dragon', 'Colorless',
+  'Grass',
+  'Fire',
+  'Water',
+  'Lightning',
+  'Psychic',
+  'Fighting',
+  'Darkness',
+  'Metal',
+  'Dragon',
+  'Colorless',
 ]
 
 const CARD_TYPES = [
@@ -105,17 +132,19 @@ const STAGES = ['Basic', 'Stage 1', 'Stage 2', 'V', 'VMAX', 'VSTAR', 'GX', 'EX']
 
 // Opzioni per FilterSelect (solo stringhe)
 const seriesOptions = computed(() => seriesList.value?.map((s) => s.name) ?? [])
-const setOptions    = computed(() => filteredSets.value.map((s) => s.name))
+const setOptions = computed(() => filteredSets.value.map((s) => s.name))
 
 // Valori selezionati come stringa (per FilterSelect)
 const selectedSeriesName = computed({
-  get: () => fSeriesId.value ? (seriesList.value?.find((s) => s.id === fSeriesId.value)?.name ?? '') : '',
+  get: () =>
+    fSeriesId.value ? (seriesList.value?.find((s) => s.id === fSeriesId.value)?.name ?? '') : '',
   set: (name: string) => {
     fSeriesId.value = seriesList.value?.find((s) => s.name === name)?.id ?? null
   },
 })
 const selectedSetName = computed({
-  get: () => fSetId.value ? (filteredSets.value.find((s) => s.id === fSetId.value)?.name ?? '') : '',
+  get: () =>
+    fSetId.value ? (filteredSets.value.find((s) => s.id === fSetId.value)?.name ?? '') : '',
   set: (name: string) => {
     fSetId.value = filteredSets.value.find((s) => s.name === name)?.id ?? null
   },
@@ -124,7 +153,11 @@ const selectedSetName = computed({
 // --- Query carte (paginata, si attiva solo dopo "Cerca") ---
 const searchQueryKey = computed(() => ['cards-search', activeParams.value, page.value])
 
-const { data: result, isLoading, isFetching } = useQuery({
+const {
+  data: result,
+  isLoading,
+  isFetching,
+} = useQuery({
   queryKey: searchQueryKey,
   queryFn: () => Cards.search({ ...activeParams.value!, page: page.value, per_page: 48 }),
   staleTime: 1000 * 60 * 2,
@@ -133,13 +166,12 @@ const { data: result, isLoading, isFetching } = useQuery({
 })
 
 const cards = computed(() => result.value?.data ?? [])
-const meta  = computed(() => result.value?.meta)
+const meta = computed(() => result.value?.meta)
 const hasSearched = computed(() => activeParams.value !== null)
 </script>
 
 <template>
   <AppPage>
-
     <!-- Pannello filtri -->
     <div class="card bg-base-100 border border-base-300 shadow-sm">
       <!-- Header filtri cliccabile -->
@@ -150,7 +182,9 @@ const hasSearched = computed(() => activeParams.value !== null)
         <div class="flex items-center gap-2">
           <SlidersHorizontal class="w-4 h-4 text-base-content/50" />
           <span class="font-semibold text-sm text-base-content/80">Filtri di ricerca</span>
-          <span v-if="activeFilterCount > 0" class="badge badge-secondary badge-sm">{{ activeFilterCount }}</span>
+          <span v-if="activeFilterCount > 0" class="badge badge-secondary badge-sm">{{
+            activeFilterCount
+          }}</span>
         </div>
         <div class="flex items-center gap-2">
           <button
@@ -169,7 +203,6 @@ const hasSearched = computed(() => activeParams.value !== null)
 
       <!-- Corpo filtri -->
       <div v-show="filtersOpen" class="border-t border-base-300 p-5 space-y-4">
-
         <!-- Riga 1: nome + serie + set -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <FormKit
@@ -203,11 +236,7 @@ const hasSearched = computed(() => activeParams.value !== null)
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div class="flex flex-col gap-1">
             <label class="text-xs text-base-content/50 px-1">Stage</label>
-            <FilterSelect
-              v-model="fStage"
-              :options="STAGES"
-              placeholder="Tutti gli stage"
-            />
+            <FilterSelect v-model="fStage" :options="STAGES" placeholder="Tutti gli stage" />
           </div>
           <div class="sm:col-span-2 flex items-end">
             <FormKit
@@ -221,7 +250,9 @@ const hasSearched = computed(() => activeParams.value !== null)
 
         <!-- Tipo carta (pill toggle) -->
         <div class="flex flex-wrap gap-2 items-center">
-          <span class="text-xs text-base-content/40 uppercase tracking-wider w-14 shrink-0">Tipo</span>
+          <span class="text-xs text-base-content/40 uppercase tracking-wider w-14 shrink-0"
+            >Tipo</span
+          >
           <button
             v-for="ct in CARD_TYPES"
             :key="ct.id"
@@ -234,21 +265,31 @@ const hasSearched = computed(() => activeParams.value !== null)
                 : 'opacity-40 hover:opacity-70',
             ]"
             @click="fCardTypeId = fCardTypeId === ct.id ? null : ct.id"
-          >{{ ct.name }}</button>
+          >
+            {{ ct.name }}
+          </button>
         </div>
 
         <!-- Energia (pill toggle) -->
         <div class="flex flex-wrap gap-2 items-center">
-          <span class="text-xs text-base-content/40 uppercase tracking-wider w-14 shrink-0">Energia</span>
+          <span class="text-xs text-base-content/40 uppercase tracking-wider w-14 shrink-0"
+            >Energia</span
+          >
           <button
             v-for="e in ENERGY_TYPES"
             :key="e"
             type="button"
             class="badge badge-md cursor-pointer border transition-all duration-150"
             :style="getEnergyStyle(e)"
-            :class="fEnergyType === e ? 'opacity-100 ring-2 ring-offset-1 ring-current' : 'opacity-50 hover:opacity-80'"
+            :class="
+              fEnergyType === e
+                ? 'opacity-100 ring-2 ring-offset-1 ring-current'
+                : 'opacity-50 hover:opacity-80'
+            "
             @click="fEnergyType = fEnergyType === e ? null : e"
-          >{{ e }}</button>
+          >
+            {{ e }}
+          </button>
         </div>
 
         <!-- Azioni -->
@@ -257,7 +298,11 @@ const hasSearched = computed(() => activeParams.value !== null)
             <Search class="w-4 h-4" />
             Cerca
           </button>
-          <button v-if="hasActiveFilters" class="btn btn-ghost gap-1.5 text-base-content/50" @click="resetFilters">
+          <button
+            v-if="hasActiveFilters"
+            class="btn btn-ghost gap-1.5 text-base-content/50"
+            @click="resetFilters"
+          >
             <X class="w-3.5 h-3.5" /> Reset filtri
           </button>
         </div>
@@ -272,7 +317,10 @@ const hasSearched = computed(() => activeParams.value !== null)
           <span v-if="isFetching" class="loading loading-spinner loading-xs text-secondary" />
           <span class="text-sm text-base-content/50">
             <template v-if="meta && !isLoading">
-              <span class="font-semibold text-base-content">{{ meta.total.toLocaleString('it-IT') }}</span> carte trovate
+              <span class="font-semibold text-base-content">{{
+                meta.total.toLocaleString('it-IT')
+              }}</span>
+              carte trovate
             </template>
             <template v-else-if="isLoading">Ricerca in corso...</template>
           </span>
@@ -284,7 +332,11 @@ const hasSearched = computed(() => activeParams.value !== null)
           <span class="join-item btn btn-sm btn-ghost no-animation pointer-events-none">
             {{ page }} / {{ meta.last_page }}
           </span>
-          <button class="join-item btn btn-sm btn-ghost" :disabled="page === meta.last_page" @click="page++">
+          <button
+            class="join-item btn btn-sm btn-ghost"
+            :disabled="page === meta.last_page"
+            @click="page++"
+          >
             <ChevronRight class="w-4 h-4" />
           </button>
         </div>
@@ -312,16 +364,25 @@ const hasSearched = computed(() => activeParams.value !== null)
               class="join-item btn btn-sm"
               :class="p === page ? 'btn-secondary' : 'btn-ghost'"
               @click="page = p"
-            >{{ p }}</button>
+            >
+              {{ p }}
+            </button>
             <span
               v-else-if="Math.abs(p - page) === 3"
               class="join-item btn btn-sm btn-ghost no-animation pointer-events-none"
-            >…</span>
+              >…</span
+            >
           </template>
           <button class="join-item btn btn-sm" :disabled="page === meta.last_page" @click="page++">
             <ChevronRight class="w-4 h-4" />
           </button>
-          <button class="join-item btn btn-sm" :disabled="page === meta.last_page" @click="page = meta.last_page">»</button>
+          <button
+            class="join-item btn btn-sm"
+            :disabled="page === meta.last_page"
+            @click="page = meta.last_page"
+          >
+            »
+          </button>
         </div>
       </div>
     </template>
@@ -329,9 +390,15 @@ const hasSearched = computed(() => activeParams.value !== null)
     <!-- Empty state iniziale -->
     <div v-else class="flex flex-col items-center justify-center py-24 text-center">
       <div class="relative mb-6 select-none">
-        <div class="w-20 h-28 bg-base-200 rounded-2xl rotate-6 absolute -top-1 -right-4 opacity-40" />
-        <div class="w-20 h-28 bg-base-200 rounded-2xl -rotate-3 absolute -top-1 -left-3 opacity-60" />
-        <div class="w-20 h-28 bg-secondary/10 border border-secondary/20 rounded-2xl relative flex items-center justify-center">
+        <div
+          class="w-20 h-28 bg-base-200 rounded-2xl rotate-6 absolute -top-1 -right-4 opacity-40"
+        />
+        <div
+          class="w-20 h-28 bg-base-200 rounded-2xl -rotate-3 absolute -top-1 -left-3 opacity-60"
+        />
+        <div
+          class="w-20 h-28 bg-secondary/10 border border-secondary/20 rounded-2xl relative flex items-center justify-center"
+        >
           <Search class="w-8 h-8 text-secondary/40" />
         </div>
       </div>
@@ -340,6 +407,5 @@ const hasSearched = computed(() => activeParams.value !== null)
         Imposta i filtri e premi <strong>Cerca</strong> per sfogliare le carte del catalogo.
       </p>
     </div>
-
   </AppPage>
 </template>

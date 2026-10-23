@@ -11,7 +11,9 @@ const modalStore = useModalStore()
 const { handleSubmit, loading, allErrors } = useGradingCompanyModal()
 
 const currentGradingCompany = computed(() => modalStore.currentData as GradingCompany | null)
-const title = computed(() => (modalStore.mode === 'create' ? 'Nuova compagnia di grading' : 'Modifica compagnia di grading'))
+const title = computed(() =>
+  modalStore.mode === 'create' ? 'Nuova compagnia di grading' : 'Modifica compagnia di grading',
+)
 const btnClass = computed(() => (modalStore.mode === 'create' ? 'btn-secondary' : 'btn-success'))
 </script>
 

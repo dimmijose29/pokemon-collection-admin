@@ -74,8 +74,7 @@ const { mutate: restore, isPending: isRestoring } = useMutation({
 })
 
 const { mutate: toggleAdmin, isPending: isTogglingAdmin } = useMutation({
-  mutationFn: ({ id, isAdmin }: { id: number; isAdmin: boolean }) =>
-    Users.toggleAdmin(id, isAdmin),
+  mutationFn: ({ id, isAdmin }: { id: number; isAdmin: boolean }) => Users.toggleAdmin(id, isAdmin),
   onSuccess: (_, { isAdmin }) => {
     queryClient.invalidateQueries({ queryKey: ['users'] })
     show(isAdmin ? 'Utente promosso ad admin' : 'Privilegi admin rimossi')
@@ -89,8 +88,13 @@ const sortedUsers = computed(() => {
   const { field, direction } = sort.value
   const mult = direction === 'asc' ? 1 : -1
   return [...users.value].sort((a, b) => {
-    if (field === 'created_at') return (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * mult
-    return String(a[field as keyof typeof a] ?? '').localeCompare(String(b[field as keyof typeof b] ?? '')) * mult
+    if (field === 'created_at')
+      return (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * mult
+    return (
+      String(a[field as keyof typeof a] ?? '').localeCompare(
+        String(b[field as keyof typeof b] ?? ''),
+      ) * mult
+    )
   })
 })
 </script>
@@ -116,10 +120,33 @@ const sortedUsers = computed(() => {
 
     <template #head>
       <tr>
-        <SortableHeader field="username" label="Utente" :model-value="sort" @update:model-value="sort = $event" />
-        <SortableHeader field="email" label="Email" :model-value="sort" class="hidden md:table-cell" @update:model-value="sort = $event" />
-        <SortableHeader field="country" label="Paese" :model-value="sort" class="hidden md:table-cell" @update:model-value="sort = $event" />
-        <SortableHeader field="created_at" label="Registrato il" :model-value="sort" class="hidden lg:table-cell" @update:model-value="sort = $event" />
+        <SortableHeader
+          field="username"
+          label="Utente"
+          :model-value="sort"
+          @update:model-value="sort = $event"
+        />
+        <SortableHeader
+          field="email"
+          label="Email"
+          :model-value="sort"
+          class="hidden md:table-cell"
+          @update:model-value="sort = $event"
+        />
+        <SortableHeader
+          field="country"
+          label="Paese"
+          :model-value="sort"
+          class="hidden md:table-cell"
+          @update:model-value="sort = $event"
+        />
+        <SortableHeader
+          field="created_at"
+          label="Registrato il"
+          :model-value="sort"
+          class="hidden lg:table-cell"
+          @update:model-value="sort = $event"
+        />
         <th class="w-28"></th>
       </tr>
     </template>
@@ -181,7 +208,7 @@ const sortedUsers = computed(() => {
             </button>
 
             <ActionColumn
-              :actions="user.deleted_at ? ['restore'] : (user.id !== auth.user?.id ? ['delete'] : [])"
+              :actions="user.deleted_at ? ['restore'] : user.id !== auth.user?.id ? ['delete'] : []"
               @delete="remove(user.id)"
               @restore="restore(user.id)"
             />

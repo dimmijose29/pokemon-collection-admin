@@ -11,7 +11,9 @@ const modalStore = useModalStore()
 const { handleSubmit, loading, allErrors } = useCardTypeModal()
 
 const currentCardType = computed(() => modalStore.currentData as CardType | null)
-const title = computed(() => (modalStore.mode === 'create' ? 'Nuovo tipo carta' : 'Modifica tipo carta'))
+const title = computed(() =>
+  modalStore.mode === 'create' ? 'Nuovo tipo carta' : 'Modifica tipo carta',
+)
 const btnClass = computed(() => (modalStore.mode === 'create' ? 'btn-secondary' : 'btn-success'))
 </script>
 

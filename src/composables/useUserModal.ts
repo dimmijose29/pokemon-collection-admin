@@ -27,7 +27,9 @@ export function useUserModal() {
     loading.value = true
     clearErrors()
     try {
-      await Users.create(data as { email: string; username: string; password: string; is_admin?: boolean })
+      await Users.create(
+        data as { email: string; username: string; password: string; is_admin?: boolean },
+      )
       show('Utente creato con successo')
       await queryClient.invalidateQueries({ queryKey: ['users'] })
       close()
