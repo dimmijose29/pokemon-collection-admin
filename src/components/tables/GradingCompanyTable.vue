@@ -1,20 +1,21 @@
 <script setup lang="ts">
 import AppTable from '@/components/app/AppTable.vue'
+import BaseDataTable from '@/components/base/BaseDataTable.vue'
+import type { DataColumn } from '@/components/base/dataTable'
 import ActionColumn from '@/components/shared/ActionColumn.vue'
 import StatusFilter from '@/components/shared/StatusFilter.vue'
-import SortableHeader from '@/components/shared/SortableHeader.vue'
 import AppLoading from '@/components/app/AppLoading.vue'
 import { formatDate } from '@/utils/dates'
 import { useModalStore } from '@/stores/modal'
 import { useCrudTable } from '@/composables/useCrudTable'
 import GradingCompanies from '@/api/grading-companies'
+import type { GradingCompany } from '@/types/grading-company'
 
 const modalStore = useModalStore()
 
 const {
   search,
   statusFilter,
-  sort,
   rows,
   total,
   isLoading,
@@ -35,6 +36,12 @@ const {
     transformers: { created_at: (v) => formatDate(v as string) },
   },
 })
+
+const columns: DataColumn<GradingCompany>[] = [
+  { id: 'name', label: 'Nome' },
+  { id: 'created_at', label: 'Creato il' },
+  { id: 'actions', class: 'w-24' },
+]
 </script>
 
 <template>
@@ -42,7 +49,6 @@ const {
     v-model:search="search"
     search-placeholder="Cerca..."
     :total="total"
-    :loading="isLoading || isFetching"
     :refreshing="isFetching"
     @refresh="refetch()"
   >
@@ -50,38 +56,22 @@ const {
       <StatusFilter v-model="statusFilter" />
     </template>
 
-    <template #head>
-      <tr>
-        <SortableHeader
-          field="name"
-          label="Nome"
-          :model-value="sort"
-          @update:model-value="sort = $event"
+    <BaseDataTable :rows="rows" :columns="columns" :loading="isLoading">
+      <template #cell-name="{ row }">
+        <span class="font-medium">{{ row.name }}</span>
+      </template>
+      <template #cell-created_at="{ row }">
+        <span class="text-base-content/60 text-sm">{{ formatDate(row.created_at) }}</span>
+      </template>
+      <template #cell-actions="{ row }">
+        <ActionColumn
+          :actions="row.deleted_at ? ['restore'] : ['edit', 'delete']"
+          @edit="modalStore.open(row)"
+          @delete="remove(row.id)"
+          @restore="restore(row.id)"
         />
-        <SortableHeader
-          field="created_at"
-          label="Creato il"
-          :model-value="sort"
-          @update:model-value="sort = $event"
-        />
-        <th class="w-24"></th>
-      </tr>
-    </template>
-
-    <template #body>
-      <tr v-for="company in rows" :key="company.id" class="hover">
-        <td class="font-medium">{{ company.name }}</td>
-        <td class="text-base-content/60 text-sm">{{ formatDate(company.created_at) }}</td>
-        <td>
-          <ActionColumn
-            :actions="company.deleted_at ? ['restore'] : ['edit', 'delete']"
-            @edit="modalStore.open(company)"
-            @delete="remove(company.id)"
-            @restore="restore(company.id)"
-          />
-        </td>
-      </tr>
-    </template>
+      </template>
+    </BaseDataTable>
   </AppTable>
 
   <AppLoading :visible="isMutating" />

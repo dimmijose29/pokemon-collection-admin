@@ -16,6 +16,7 @@ Pannello di amministrazione per l'applicazione Pokémon Collection, costruito co
 | VeeValidate + Zod | 4.x / 4.x | Form e validazione (schemi in `src/validation`) |
 | Reka UI | 2.x | Componenti headless (combobox) |
 | TanStack Vue Query | 5.x | Fetching, cache e sincronizzazione dati |
+| TanStack Vue Table | 8.x | Tabelle: ordinamento e paginazione (`BaseDataTable`) |
 | Pinia | 3.x | State management |
 | Axios | 1.x | Client HTTP |
 | Chart.js | 4.x | Grafici della dashboard |
@@ -86,7 +87,7 @@ src/
 ├── composables/    # useToast, useErrorList, useXxxModal...
 ├── validation/     # Schemi Zod condivisi e adattatore per VeeValidate
 ├── components/
-│   ├── base/       # Campi dei form: BaseInput, BaseSelect, BaseCheckbox
+│   ├── base/       # Campi dei form (BaseInput, BaseSelect...) e BaseDataTable
 │   ├── app/        # Componenti base: AppModal, AppTable, AppLoading
 │   ├── forms/      # Form presentazionali (emettono submit, non fanno API call)
 │   ├── modals/     # Wrapper AppModal per ogni entità
@@ -112,7 +113,7 @@ View  →  Table / Card  →  Modal  →  Form
 ```
 
 - Le **View** sono thin: montano tabella, modale e poco altro
-- Le **Table** gestiscono query e mutations (TanStack Query)
+- Le **Table** usano `useCrudTable` (query, filtri, mutations) e `BaseDataTable` (colonne, ordinamento, paginazione)
 - I **composables** `useXxxModal` centralizzano la logica delle modali (API call, errori, toast)
 - I **Form** sono puramente presentazionali: ricevono props, emettono `submit`
 

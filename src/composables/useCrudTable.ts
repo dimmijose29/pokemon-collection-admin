@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import axios from 'axios'
 import type { CrudApi } from '@/api/crud'
 import type { StatusFilterValue } from '@/components/shared/StatusFilter.vue'
-import type { SortState } from '@/components/shared/SortableHeader.vue'
 import { useToast } from '@/composables/useToast'
 import { filterBySearch } from '@/utils/search'
 
@@ -11,8 +10,6 @@ interface CrudRow {
   id: number
   deleted_at?: string | null
 }
-
-type Comparator<T> = (a: T, b: T) => number
 
 interface CrudTableOptions<T extends CrudRow> {
   api: Pick<CrudApi<T, unknown>, 'get' | 'remove' | 'restore'>
@@ -23,24 +20,11 @@ interface CrudTableOptions<T extends CrudRow> {
   search?: Parameters<typeof filterBySearch<T>>[2]
   /** Filtri aggiuntivi della tabella, applicati dopo stato ed eliminati. */
   filter?: (rows: T[]) => T[]
-  /** Confronti personalizzati per campo; gli altri campi usano compareValues. */
-  sorters?: Partial<Record<string, Comparator<T>>>
-}
-
-/**
- * Confronto di default: date ISO e numeri per valore, il resto come stringa.
- */
-function compareValues(a: unknown, b: unknown): number {
-  if (typeof a === 'number' || typeof b === 'number') return (Number(a) || 0) - (Number(b) || 0)
-  const aDate = typeof a === 'string' ? Date.parse(a) : NaN
-  const bDate = typeof b === 'string' ? Date.parse(b) : NaN
-  if (!isNaN(aDate) && !isNaN(bDate) && /^\d{4}-\d{2}-\d{2}/.test(String(a))) return aDate - bDate
-  return String(a ?? '').localeCompare(String(b ?? ''))
 }
 
 /**
  * Logica comune delle tabelle di catalogo: caricamento (eliminati inclusi),
- * filtro attivi/eliminati, ricerca, ordinamento ed eliminazione/ripristino con toast.
+ * filtro attivi/eliminati, ricerca ed eliminazione/ripristino con toast.
  */
 export function useCrudTable<T extends CrudRow>(options: CrudTableOptions<T>) {
   const queryClient = useQueryClient()
@@ -48,7 +32,6 @@ export function useCrudTable<T extends CrudRow>(options: CrudTableOptions<T>) {
 
   const search = ref('')
   const statusFilter = ref<StatusFilterValue>('active')
-  const sort = ref<SortState | null>(null)
 
   // Tutti i record, eliminati compresi: il filtro di stato è lato client
   const { data, isLoading, isFetching, refetch } = useQuery({
@@ -68,17 +51,10 @@ export function useCrudTable<T extends CrudRow>(options: CrudTableOptions<T>) {
     return filterBySearch(list, search.value, options.search)
   })
 
-  const rows = computed(() => {
-    if (!sort.value) return filtered.value
-    const { field, direction } = sort.value
-    const mult = direction === 'asc' ? 1 : -1
-    const compare =
-      options.sorters?.[field] ??
-      ((a: T, b: T) => compareValues(a[field as keyof T], b[field as keyof T]))
-    return [...filtered.value].sort((a, b) => compare(a, b) * mult)
-  })
+  // L'ordinamento lo fa BaseDataTable (TanStack Table)
+  const rows = filtered
 
-  const total = computed(() => filtered.value.length)
+  const total = computed(() => rows.value.length)
 
   function onError(error: unknown) {
     const message = axios.isAxiosError(error) ? error.response?.data?.message : undefined
@@ -110,7 +86,6 @@ export function useCrudTable<T extends CrudRow>(options: CrudTableOptions<T>) {
   return {
     search,
     statusFilter,
-    sort,
     all,
     rows,
     total,

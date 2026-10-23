@@ -70,25 +70,9 @@ describe('useCrudTable', () => {
     expect(table.rows.value.map((r) => r.id)).toEqual([1])
   })
 
-  it('ordina stringhe, numeri e date per valore', async () => {
-    const { table } = setup()
-    await flushPromises()
-    table.statusFilter.value = 'all'
-
-    table.sort.value = { field: 'name', direction: 'asc' }
-    expect(table.rows.value.map((r) => r.name)).toEqual(['alfa', 'Bravo', 'Charlie'])
-
-    table.sort.value = { field: 'count', direction: 'desc' }
-    expect(table.rows.value.map((r) => r.count)).toEqual([30, 10, 2])
-
-    table.sort.value = { field: 'created_at', direction: 'asc' }
-    expect(table.rows.value.map((r) => r.id)).toEqual([2, 3, 1])
-  })
-
-  it('applica filtri e comparatori personalizzati', async () => {
+  it('applica i filtri aggiuntivi della tabella', async () => {
     const { table } = setup({
       filter: (list) => list.filter((r) => r.count > 5),
-      sorters: { name: (a, b) => b.name.length - a.name.length },
     })
     await flushPromises()
 

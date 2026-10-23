@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@tanstack/vue-query": "^5.96.0",
+    "@tanstack/vue-table": "^8.21.3",
     "@tcgdex/sdk": "^2.7.1",
     "@vueuse/motion": "^3.0.3",
     "axios": "^1.13.6",
