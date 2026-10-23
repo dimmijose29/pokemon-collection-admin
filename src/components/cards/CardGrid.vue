@@ -13,12 +13,7 @@ const props = defineProps<{
   cards: Card[]
   loading?: boolean
   set?: Set | null
-  hideToolbar?: boolean
   emptyMessage?: string
-}>()
-
-const emit = defineEmits<{
-  'card-click': [card: Card]
 }>()
 
 type Layout = 'list' | 'grid'
@@ -55,15 +50,13 @@ const detailOpen = ref(false)
 function openCard(card: Card) {
   selectedCard.value = card
   detailOpen.value = true
-  emit('card-click', card)
 }
 </script>
 
 <template>
   <div>
-    <!-- Toolbar layout (solo se non nascosta) -->
+    <!-- Toolbar layout -->
     <div
-      v-if="!hideToolbar"
       class="flex items-center justify-between px-4 py-2.5 border-b border-base-300"
     >
       <span class="text-sm text-base-content/50">

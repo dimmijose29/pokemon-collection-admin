@@ -16,14 +16,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "coverage": "vitest run --coverage",
-    "build:css": "npx @tailwindcss/cli -i src/assets/app.css -o public/app.css",
-    "watch:css": "npx @tailwindcss/cli -i src/assets/app.css -o public/app.css --watch"
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@formkit/i18n": "^1.7.2",
     "@formkit/icons": "^1.7.2",
     "@formkit/vue": "^1.7.2",
-    "@tailwindcss/vite": "^4.2.2",
     "@tanstack/vue-query": "^5.96.0",
     "@tcgdex/sdk": "^2.7.1",
     "@vueuse/motion": "^3.0.3",
@@ -31,12 +29,11 @@
     "chart.js": "^4.5.1",
     "lucide-vue-next": "^0.577.0",
     "pinia": "^3.0.4",
-    "tailwindcss": "^4.2.2",
-    "ts-node": "^10.9.2",
     "vue": "^3.5.29",
     "vue-router": "^5.0.3"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.2.2",
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^24.11.0",
     "@vitejs/plugin-vue": "^6.0.4",
@@ -45,7 +42,6 @@
     "@vue/eslint-config-typescript": "^14.7.0",
     "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.8.1",
-    "autoprefixer": "^10.4.20",
     "daisyui": "^5.5.19",
     "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
@@ -56,6 +52,7 @@
     "npm-run-all2": "^8.0.4",
     "oxlint": "~1.50.0",
     "prettier": "3.8.1",
+    "tailwindcss": "^4.2.2",
     "typescript": "~5.9.3",
     "vite": "^7.3.1",
     "vite-plugin-vue-devtools": "^8.0.6",

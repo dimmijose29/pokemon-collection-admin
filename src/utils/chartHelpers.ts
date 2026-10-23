@@ -1,13 +1,12 @@
 import { Chart } from 'chart.js'
 
 /**
- * Imposta i default globali di Chart.js: font Manrope (stesso dell'app).
- * Va chiamato una sola volta in main.ts.
+ * Default globali di Chart.js: font Manrope (stesso dell'app).
+ * Impostati al primo import di questo modulo, che avviene solo nei componenti grafico:
+ * così Chart.js resta nel chunk della dashboard e non nel bundle principale.
  */
-export function setupChartDefaults() {
-  Chart.defaults.font.family = 'Manrope, system-ui, sans-serif'
-  Chart.defaults.font.size = 12
-}
+Chart.defaults.font.family = 'Manrope, system-ui, sans-serif'
+Chart.defaults.font.size = 12
 
 /**
  * Legge i colori dal tema DaisyUI corrente (light o dark).

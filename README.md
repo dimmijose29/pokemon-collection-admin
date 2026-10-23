@@ -8,35 +8,38 @@ Pannello di amministrazione per l'applicazione Pokémon Collection, costruito co
 
 | Tecnologia | Versione | Utilizzo |
 |---|---|---|
-| Vue 3 | — | Framework UI (Composition API + `<script setup>`) |
-| TypeScript | — | Tipizzazione |
-| Vite | — | Build tool e dev server |
+| Vue 3 | 3.5 | Framework UI (Composition API + `<script setup>`) |
+| TypeScript | 5.9 | Tipizzazione |
+| Vite | 7.x | Build tool e dev server |
 | Tailwind CSS | 4.x | Utility CSS |
 | DaisyUI | 5.x | Componenti UI (temi `pokemon` / `pokemon-dark`) |
 | FormKit | 1.x | Gestione form (locale italiano) |
-| TanStack Vue Query | — | Fetching, cache e sincronizzazione dati |
-| Pinia | — | State management |
+| TanStack Vue Query | 5.x | Fetching, cache e sincronizzazione dati |
+| Pinia | 3.x | State management |
+| Axios | 1.x | Client HTTP |
+| Chart.js | 4.x | Grafici della dashboard |
 | Lucide Vue Next | — | Icone |
-| Vue Router | 4.x | Routing |
+| Vue Router | 5.x | Routing |
+| Vitest | 3.x | Test |
 
 ---
 
 ## Requisiti
 
-- Node.js >= 18
-- npm >= 9
+- Node.js ^20.19 oppure >= 22.12 (richiesto da Vite 7)
+- npm >= 10
+- L'API `pokemon-collection-api` in esecuzione
 
 ---
 
 ## Installazione
 
 ```bash
-# Entra nella cartella frontend
-cd admin
-
-# Installa le dipendenze
 npm install
 ```
+
+L'indirizzo dell'API si imposta con `VITE_API_URL` (default `http://localhost:8000/api`), per esempio in un file
+`.env.local`. Il valore viene incluso al momento della build.
 
 ---
 
@@ -46,7 +49,7 @@ npm install
 npm run dev
 ```
 
-L'app sarà disponibile su `http://localhost:5173`.
+L'app sarà disponibile su `http://localhost:5173`. Il pannello è riservato agli utenti admin.
 
 ## Build per produzione
 
@@ -58,6 +61,12 @@ npm run build
 
 ```bash
 npm run type-check
+```
+
+## Test
+
+```bash
+npm run test
 ```
 
 ## Lint
