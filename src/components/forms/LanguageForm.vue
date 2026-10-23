@@ -1,65 +1,49 @@
 <script setup lang="ts">
+import { useForm } from 'vee-validate'
+import { z } from 'zod'
 import type { Language } from '@/types/language'
+import type { LanguagePayload } from '@/api/languages'
+import { toTypedSchema } from '@/validation/toTypedSchema'
+import { requiredString } from '@/validation/schemas'
+import BaseInput from '@/components/base/BaseInput.vue'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
 
-defineProps<{
+const props = defineProps<{
   language?: Language | null
   variant?: 'create' | 'edit'
   errors?: string[]
 }>()
 
 const emit = defineEmits<{
-  submit: [data: Record<string, unknown>]
+  submit: [data: LanguagePayload]
 }>()
+
+const { handleSubmit } = useForm({
+  validationSchema: toTypedSchema(
+    z.object({
+      code: requiredString('Il codice lingua è obbligatorio'),
+      name: requiredString('Il nome è obbligatorio'),
+      country_code: requiredString('Il codice paese è obbligatorio'),
+    }),
+  ),
+  initialValues: {
+    code: props.language?.code ?? '',
+    name: props.language?.name ?? '',
+    country_code: props.language?.country_code ?? '',
+  },
+})
+
+// Il pulsante Salva sta nel footer della modale e invia questo form tramite l'id
+const onSubmit = handleSubmit((values) => emit('submit', values))
 </script>
 
 <template>
   <ErrorAlert :errors="errors ?? []" />
-  <FormKit
-    type="form"
-    id="language-form"
-    :actions="false"
-    :value="
-      language
-        ? { code: language.code, name: language.name, country_code: language.country_code }
-        : undefined
-    "
-    @submit="(data) => emit('submit', data)"
-  >
+  <form id="language-form" novalidate @submit="onSubmit">
     <!-- Codice lingua ISO 639-1, es. en, it, jp -->
-    <FormKit
-      type="text"
-      name="code"
-      label="Codice lingua"
-      placeholder="Es. en"
-      validation="required"
-      validation-visibility="dirty"
-      :validation-messages="{ required: 'Il codice lingua è obbligatorio' }"
-      message-class="text-error text-sm mt-1"
-      outer-class="max-w-full"
-    />
-    <FormKit
-      type="text"
-      name="name"
-      label="Nome"
-      placeholder="Es. Inglese"
-      validation="required"
-      validation-visibility="dirty"
-      :validation-messages="{ required: 'Il nome è obbligatorio' }"
-      message-class="text-error text-sm mt-1"
-      outer-class="max-w-full"
-    />
-    <!-- Codice paese ISO 3166-1 alpha-2, es. US, IT, JP — il backend lo converte in maiuscolo -->
-    <FormKit
-      type="text"
-      name="country_code"
-      label="Codice paese"
-      placeholder="Es. US"
-      validation="required"
-      validation-visibility="dirty"
-      :validation-messages="{ required: 'Il codice paese è obbligatorio' }"
-      message-class="text-error text-sm mt-1"
-      outer-class="max-w-full"
-    />
-  </FormKit>
+    <BaseInput name="code" label="Codice lingua" placeholder="Es. en" required />
+    <BaseInput name="name" label="Nome" placeholder="Es. Inglese" required />
+    <!-- Codice paese ISO 3166-1 alpha-2: il backend lo converte in maiuscolo -->
+    <BaseInput name="country_code" label="Codice paese" placeholder="Es. US" required />
+  </form>
 </template>

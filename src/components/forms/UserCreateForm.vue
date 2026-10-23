@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import { useForm } from 'vee-validate'
+import { z } from 'zod'
+import { toTypedSchema } from '@/validation/toTypedSchema'
+import { emailField, passwordField, requiredString } from '@/validation/schemas'
+import BaseInput from '@/components/base/BaseInput.vue'
+import BaseCheckbox from '@/components/base/BaseCheckbox.vue'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
 
 defineProps<{
@@ -6,65 +12,50 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  submit: [data: Record<string, unknown>]
+  submit: [data: { email: string; username: string; password: string; is_admin: boolean }]
 }>()
+
+const { handleSubmit } = useForm({
+  validationSchema: toTypedSchema(
+    z.object({
+      email: emailField("L'email è obbligatoria"),
+      username: requiredString('Lo username è obbligatorio'),
+      password: passwordField(8, 'La password è obbligatoria'),
+      is_admin: z.boolean(),
+    }),
+  ),
+  initialValues: { email: '', username: '', password: '', is_admin: false },
+})
+
+const onSubmit = handleSubmit((values) => emit('submit', values))
 </script>
 
 <template>
   <ErrorAlert :errors="errors ?? []" />
-  <FormKit
-    type="form"
-    id="user-create-form"
-    :actions="false"
-    @submit="(data) => emit('submit', data)"
-  >
+  <form id="user-create-form" novalidate @submit="onSubmit">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4">
-      <FormKit
-        type="email"
-        name="email"
-        label="Email"
-        placeholder="Es. utente@esempio.it"
-        validation="required|email"
-        validation-visibility="dirty"
-        :validation-messages="{
-          required: 'L\'email è obbligatoria',
-          email: 'Inserisci un\'email valida',
-        }"
-        message-class="text-error text-sm mt-1"
-        outer-class="max-w-full md:col-span-2"
-      />
-      <FormKit
-        type="text"
-        name="username"
-        label="Username"
-        placeholder="Es. ash_ketchum"
-        validation="required"
-        validation-visibility="dirty"
-        :validation-messages="{ required: 'Lo username è obbligatorio' }"
-        message-class="text-error text-sm mt-1"
-        outer-class="max-w-full"
-      />
-      <FormKit
-        type="password"
+      <div class="md:col-span-2">
+        <BaseInput
+          name="email"
+          type="email"
+          label="Email"
+          placeholder="Es. utente@esempio.it"
+          autocomplete="off"
+          required
+        />
+      </div>
+      <BaseInput name="username" label="Username" placeholder="Es. ash_ketchum" required />
+      <BaseInput
         name="password"
+        type="password"
         label="Password"
         placeholder="Minimo 8 caratteri"
-        validation="required|length:8"
-        validation-visibility="dirty"
-        :validation-messages="{
-          required: 'La password è obbligatoria',
-          length: 'Minimo 8 caratteri',
-        }"
-        message-class="text-error text-sm mt-1"
-        outer-class="max-w-full"
+        autocomplete="new-password"
+        required
       />
-      <FormKit
-        type="checkbox"
-        name="is_admin"
-        label="Amministratore"
-        :value="false"
-        outer-class="max-w-full md:col-span-2 mt-1"
-      />
+      <div class="md:col-span-2 mt-1">
+        <BaseCheckbox name="is_admin" label="Amministratore" />
+      </div>
     </div>
-  </FormKit>
+  </form>
 </template>

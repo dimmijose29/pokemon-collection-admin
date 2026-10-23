@@ -12,11 +12,11 @@ const loading = ref(false)
 const { allErrors, setErrors, clearErrors } = useErrorList()
 const { show } = useToast()
 
-async function handleSubmit(data: Record<string, unknown>) {
+async function handleSubmit(data: { username: string }) {
   loading.value = true
   clearErrors()
   try {
-    const updated = await updateProfile({ username: data.username as string })
+    const updated = await updateProfile({ username: data.username })
     authStore.fillUser(updated)
     show('Username aggiornato con successo')
   } catch (e) {

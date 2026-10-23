@@ -1,37 +1,41 @@
 <script setup lang="ts">
+import { useForm } from 'vee-validate'
+import { z } from 'zod'
 import type { GradingCompany } from '@/types/grading-company'
+import type { GradingCompanyPayload } from '@/api/grading-companies'
+import { toTypedSchema } from '@/validation/toTypedSchema'
+import { requiredString } from '@/validation/schemas'
+import BaseInput from '@/components/base/BaseInput.vue'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
 
-defineProps<{
+const props = defineProps<{
   gradingCompany?: GradingCompany | null
   variant?: 'create' | 'edit'
   errors?: string[]
 }>()
 
 const emit = defineEmits<{
-  submit: [data: Record<string, unknown>]
+  submit: [data: GradingCompanyPayload]
 }>()
+
+const { handleSubmit } = useForm({
+  validationSchema: toTypedSchema(
+    z.object({
+      name: requiredString('Il nome è obbligatorio'),
+    }),
+  ),
+  initialValues: {
+    name: props.gradingCompany?.name ?? '',
+  },
+})
+
+// Il pulsante Salva sta nel footer della modale e invia questo form tramite l'id
+const onSubmit = handleSubmit((values) => emit('submit', values))
 </script>
 
 <template>
   <ErrorAlert :errors="errors ?? []" />
-  <FormKit
-    type="form"
-    id="grading-company-form"
-    :actions="false"
-    :value="gradingCompany ? { name: gradingCompany.name } : undefined"
-    @submit="(data) => emit('submit', data)"
-  >
-    <FormKit
-      type="text"
-      name="name"
-      label="Nome"
-      placeholder="Es. PSA"
-      validation="required"
-      validation-visibility="dirty"
-      :validation-messages="{ required: 'Il nome è obbligatorio' }"
-      message-class="text-error text-sm mt-1"
-      outer-class="max-w-full"
-    />
-  </FormKit>
+  <form id="grading-company-form" novalidate @submit="onSubmit">
+    <BaseInput name="name" label="Nome" placeholder="Es. PSA" required />
+  </form>
 </template>

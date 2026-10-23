@@ -13,7 +13,8 @@ Pannello di amministrazione per l'applicazione Pokémon Collection, costruito co
 | Vite | 7.x | Build tool e dev server |
 | Tailwind CSS | 4.x | Utility CSS |
 | DaisyUI | 5.x | Componenti UI (temi `pokemon` / `pokemon-dark`) |
-| FormKit | 1.x | Gestione form (locale italiano) |
+| VeeValidate + Zod | 4.x / 4.x | Form e validazione (schemi in `src/validation`) |
+| Reka UI | 2.x | Componenti headless (combobox) |
 | TanStack Vue Query | 5.x | Fetching, cache e sincronizzazione dati |
 | Pinia | 3.x | State management |
 | Axios | 1.x | Client HTTP |
@@ -83,7 +84,9 @@ npm run lint
 src/
 ├── api/            # Client HTTP per ogni entità (Axios)
 ├── composables/    # useToast, useErrorList, useXxxModal...
+├── validation/     # Schemi Zod condivisi e adattatore per VeeValidate
 ├── components/
+│   ├── base/       # Campi dei form: BaseInput, BaseSelect, BaseCheckbox
 │   ├── app/        # Componenti base: AppModal, AppTable, AppLoading
 │   ├── forms/      # Form presentazionali (emettono submit, non fanno API call)
 │   ├── modals/     # Wrapper AppModal per ogni entità

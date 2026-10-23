@@ -10,14 +10,18 @@ const loading = ref(false)
 const { allErrors, setErrors, clearErrors } = useErrorList()
 const { show } = useToast()
 
-async function handleSubmit(data: Record<string, unknown>) {
+async function handleSubmit(data: {
+  current_password: string
+  new_password: string
+  new_password_confirm: string
+}) {
   loading.value = true
   clearErrors()
   try {
     await updatePassword({
-      current_password: data.current_password as string,
-      password: data.new_password as string,
-      password_confirmation: data.new_password_confirm as string,
+      current_password: data.current_password,
+      password: data.new_password,
+      password_confirmation: data.new_password_confirm,
     })
     show('Password aggiornata con successo. Le altre sessioni sono state disconnesse.')
   } catch (e) {

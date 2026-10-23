@@ -1,5 +1,3 @@
-//TODO controllare il processo di attivazione, crea un token appena lo richiedi anche se non
-confermi e poi non viene tolto se fai annulla
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Check, X } from 'lucide-vue-next'
@@ -34,20 +32,22 @@ function submit() {
       </div>
 
       <div class="flex items-end gap-2 flex-wrap">
-        <FormKit
-          v-model="code"
-          type="text"
-          name="code"
-          label="Codice authenticator"
-          inputmode="numeric"
-          maxlength="6"
-          placeholder="000000"
-          outer-class="mb-0 max-w-[160px]"
-          input-class="font-mono tracking-[0.3em] text-center"
-          @keydown.enter.prevent="submit"
-        />
+        <label class="flex flex-col gap-1 max-w-[160px]">
+          <span class="text-sm font-medium">Codice authenticator</span>
+          <input
+            v-model="code"
+            type="text"
+            name="code"
+            inputmode="numeric"
+            maxlength="6"
+            autocomplete="one-time-code"
+            placeholder="000000"
+            class="input app-field-control font-mono tracking-[0.3em] text-center"
+            @keydown.enter.prevent="submit"
+          />
+        </label>
 
-        <div class="flex gap-2 pb-5">
+        <div class="flex gap-2">
           <button
             type="button"
             class="btn btn-sm btn-success"

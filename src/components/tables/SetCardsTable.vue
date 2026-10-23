@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SearchInput from '@/components/shared/SearchInput.vue'
 import { ref, computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { RotateCcw } from 'lucide-vue-next'
@@ -87,14 +88,7 @@ const filtered = computed(() => {
     <!-- Ricerca -->
     <div class="flex flex-wrap items-center gap-3 px-4 py-3 border-b border-base-300">
       <div class="flex-1 min-w-0">
-        <FormKit
-          v-model="search"
-          type="text"
-          prefix-icon="search"
-          outer-class="!mb-0"
-          input-class="outline-0"
-          placeholder="Cerca per nome o codice..."
-        />
+        <SearchInput v-model="search" placeholder="Cerca per nome o codice..." />
       </div>
       <button class="btn btn-sm btn-soft gap-2" :disabled="isFetching" @click="refetch()">
         <RotateCcw class="w-3.5 h-3.5" :class="isFetching ? 'animate-spin' : ''" />

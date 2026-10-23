@@ -1,40 +1,36 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useForm } from 'vee-validate'
+import { z } from 'zod'
 import { forgotPassword } from '@/api/auth'
+import { useErrorList } from '@/composables/useErrorList'
+import { toTypedSchema } from '@/validation/toTypedSchema'
+import { emailField } from '@/validation/schemas'
+import BaseInput from '@/components/base/BaseInput.vue'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
 import { ArrowLeft, Mail } from 'lucide-vue-next'
 
-const email = ref('')
-const errors = ref<string[]>([])
+const { allErrors, setErrors, clearErrors } = useErrorList()
 const loading = ref(false)
 const emailSent = ref(false)
 
-async function handleSubmit() {
-  loading.value = true
-  errors.value = []
+const { handleSubmit } = useForm({
+  validationSchema: toTypedSchema(z.object({ email: emailField('Inserisci la tua email') })),
+  initialValues: { email: '' },
+})
 
+const onSubmit = handleSubmit(async ({ email }) => {
+  loading.value = true
+  clearErrors()
   try {
-    await forgotPassword(email.value.trim())
+    await forgotPassword(email)
     emailSent.value = true
-  } catch (err: unknown) {
-    if (err && typeof err === 'object' && 'response' in err) {
-      const axiosErr = err as {
-        response?: { data?: { message?: string; errors?: Record<string, string[]> } }
-      }
-      if (axiosErr.response?.data?.errors) {
-        errors.value = Object.values(axiosErr.response.data.errors).flat()
-      } else if (axiosErr.response?.data?.message) {
-        errors.value = [axiosErr.response.data.message]
-      } else {
-        errors.value = ["Errore durante l'invio"]
-      }
-    } else {
-      errors.value = ['Errore di connessione']
-    }
+  } catch (err) {
+    setErrors(err)
   } finally {
     loading.value = false
   }
-}
+})
 </script>
 
 <template>
@@ -62,31 +58,13 @@ async function handleSubmit() {
           Inserisci la tua email e ti invieremo un link per reimpostare la password.
         </p>
 
-        <ErrorAlert :errors="errors" />
+        <ErrorAlert :errors="allErrors" />
 
-        <FormKit
-          type="form"
-          @submit="handleSubmit"
-          submit-label="Invia"
-          :submit-attrs="{ style: { display: 'none' } }"
-        >
-          <div class="mb-5">
-            <FormKit
-              type="email"
-              name="email"
-              prefix-icon="email"
-              placeholder="La tua email"
-              outer-class="max-w-full"
-              input-class="outline-0 input-secondary"
-              v-model="email"
-              validation="required|email"
-              validation-visibility="dirty"
-              :validation-messages="{
-                required: 'Inserisci la tua email',
-                email: 'Inserisci un\'email valida',
-              }"
-              message-class="text-error text-sm mt-1"
-            />
+        <form novalidate @submit="onSubmit">
+          <div class="mb-2">
+            <BaseInput name="email" type="email" placeholder="La tua email" autocomplete="email">
+              <template #prefix><Mail class="w-4 h-4 opacity-50" /></template>
+            </BaseInput>
           </div>
 
           <button
@@ -97,7 +75,7 @@ async function handleSubmit() {
             <span v-if="loading" class="loading loading-spinner loading-sm"></span>
             Invia link
           </button>
-        </FormKit>
+        </form>
 
         <div class="text-center mt-4">
           <RouterLink to="/" class="link link-hover text-sm text-base-content/60">

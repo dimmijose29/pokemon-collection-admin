@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SearchInput from '@/components/shared/SearchInput.vue'
 import { ref, computed, watch } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { Search, X, SlidersHorizontal, ChevronLeft, ChevronRight } from 'lucide-vue-next'
@@ -205,15 +206,7 @@ const hasSearched = computed(() => activeParams.value !== null)
       <div v-show="filtersOpen" class="border-t border-base-300 p-5 space-y-4">
         <!-- Riga 1: nome + serie + set -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <FormKit
-            v-model="fName"
-            type="text"
-            prefix-icon="search"
-            outer-class="!mb-0"
-            input-class="outline-0"
-            placeholder="Cerca per nome..."
-            @keydown.enter="cerca"
-          />
+          <SearchInput v-model="fName" placeholder="Cerca per nome..." @enter="cerca" />
           <div class="flex flex-col gap-1">
             <label class="text-xs text-base-content/50 px-1">Serie</label>
             <FilterSelect
@@ -239,12 +232,14 @@ const hasSearched = computed(() => activeParams.value !== null)
             <FilterSelect v-model="fStage" :options="STAGES" placeholder="Tutti gli stage" />
           </div>
           <div class="sm:col-span-2 flex items-end">
-            <FormKit
-              v-model="fHasPrice"
-              type="checkbox"
-              label="Solo carte con prezzo Cardmarket"
-              outer-class="!mb-0"
-            />
+            <label class="flex cursor-pointer items-center gap-2">
+              <input
+                v-model="fHasPrice"
+                type="checkbox"
+                class="checkbox checkbox-sm checkbox-secondary"
+              />
+              <span class="text-sm">Solo carte con prezzo Cardmarket</span>
+            </label>
           </div>
         </div>
 

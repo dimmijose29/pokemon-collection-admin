@@ -1,66 +1,73 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useForm } from 'vee-validate'
+import { z } from 'zod'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
-import type { LoginCredentials } from '@/types/auth'
+import { toTypedSchema } from '@/validation/toTypedSchema'
+import { requiredString } from '@/validation/schemas'
+import BaseInput from '@/components/base/BaseInput.vue'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
 import OtpInput from '@/components/auth/OtpInput.vue'
 import { parseErrors } from '@/utils/parseErrors'
 import { useCapsLock } from '@/composables/useCapsLock'
-import { CircleAlert } from 'lucide-vue-next'
+import { CircleAlert, Lock, User } from 'lucide-vue-next'
 
 const auth = useAuth()
 const router = useRouter()
 const { capsLockOn, checkCapsLock } = useCapsLock()
 
-const form = ref({
-  login: '',
-  password: '',
-  code: '',
+// Fase 1: credenziali validate dallo schema. Fase 2: codice OTP (6 cifre, gestito da OtpInput)
+const { handleSubmit: validateCredentials } = useForm({
+  validationSchema: toTypedSchema(
+    z.object({
+      login: requiredString('Inserisci username o email'),
+      password: z.string().min(1, 'Inserisci la password'),
+    }),
+  ),
+  initialValues: { login: '', password: '' },
 })
 
+const code = ref('')
 const errors = ref<string[]>([])
 const twoFactorRequired = ref(false)
 const tempToken = ref('')
 const loading = ref(false)
 
-async function handleSubmit() {
-  loading.value = true
-  errors.value = []
+async function verifyCode() {
+  const res = await auth.verify2FACode(code.value, tempToken.value)
+  if (!res.success) errors.value = [res.error || 'Codice 2FA non valido']
+  else router.push({ name: 'dashboard' })
+}
 
-  // Fase 2: verifica codice OTP
-  if (twoFactorRequired.value) {
-    const res = await auth.verify2FACode(form.value.code, tempToken.value)
-    if (!res.success) errors.value = [res.error || 'Codice 2FA non valido']
-    else router.push({ name: 'dashboard' })
-
-    loading.value = false
-    return
-  }
-
-  // Fase 1: login normale
-  const payload: LoginCredentials = {
-    login: form.value.login.trim(),
-    password: form.value.password,
-  }
-
-  const res = await auth.attemptLogin(payload)
+const login = validateCredentials(async (credentials) => {
+  const res = await auth.attemptLogin(credentials)
 
   if (res.twoFactorRequired) {
     twoFactorRequired.value = true
     tempToken.value = res.tempToken || ''
-    loading.value = false
     return
   }
 
   if (!res.success) {
     errors.value = parseErrors(res.error, 'Errore durante il login')
-    loading.value = false
     return
   }
 
-  loading.value = false
   router.push({ name: 'dashboard' })
+})
+
+async function handleSubmit(e?: Event) {
+  // OTP completato e pulsante premuti insieme: una sola richiesta
+  if (loading.value) return
+  loading.value = true
+  errors.value = []
+  try {
+    if (twoFactorRequired.value) await verifyCode()
+    else await login(e)
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
@@ -74,46 +81,25 @@ async function handleSubmit() {
 
       <ErrorAlert :errors="errors" />
 
-      <FormKit
-        type="form"
-        @submit="handleSubmit"
-        submit-label="Accedi"
-        :submit-attrs="{ style: { display: 'none' } }"
-      >
+      <form novalidate @submit.prevent="handleSubmit">
         <!-- Username / Email -->
         <div v-if="!twoFactorRequired" class="mb-5">
-          <FormKit
-            type="text"
-            name="login"
-            prefix-icon="avatarMan"
-            placeholder="Username o email"
-            outer-class="max-w-full"
-            input-class="outline-0"
-            v-model="form.login"
-            validation="required"
-            validation-visibility="dirty"
-            :validation-messages="{ required: 'Inserisci username o email' }"
-            message-class="text-error text-sm mt-1"
-          />
+          <BaseInput name="login" placeholder="Username o email" autocomplete="username">
+            <template #prefix><User class="w-4 h-4 opacity-50" /></template>
+          </BaseInput>
         </div>
 
         <!-- Password -->
         <div v-if="!twoFactorRequired" class="mb-5">
-          <FormKit
-            type="password"
+          <BaseInput
             name="password"
-            suffix-icon="password"
+            type="password"
             placeholder="Password"
-            outer-class="max-w-full"
-            input-class="outline-0"
-            v-model="form.password"
-            validation="required"
-            validation-visibility="dirty"
-            :validation-messages="{ required: 'Inserisci la password' }"
-            message-class="text-error text-sm mt-1"
-            @click="checkCapsLock"
+            autocomplete="current-password"
             @keydown="checkCapsLock"
-          />
+          >
+            <template #suffix><Lock class="w-4 h-4 opacity-50" /></template>
+          </BaseInput>
           <div
             v-if="capsLockOn"
             v-motion-pop
@@ -128,7 +114,7 @@ async function handleSubmit() {
           <label class="block text-sm font-medium text-center mb-3">
             Inserisci il codice OTP a 6 cifre
           </label>
-          <OtpInput v-model="form.code" :length="6" @complete="handleSubmit" />
+          <OtpInput v-model="code" :length="6" @complete="handleSubmit()" />
         </div>
 
         <!-- Submit -->
@@ -140,7 +126,7 @@ async function handleSubmit() {
           <span v-if="loading" class="loading loading-spinner loading-sm"></span>
           {{ twoFactorRequired ? 'Verifica Codice' : 'Accedi' }}
         </button>
-      </FormKit>
+      </form>
 
       <!-- Link recupero password -->
       <div v-if="!twoFactorRequired" class="text-center mt-4">

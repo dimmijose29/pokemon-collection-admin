@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
+import { useForm } from 'vee-validate'
+import { z } from 'zod'
 import type { Set, SetPayload } from '@/types/set'
 import SeriesApi from '@/api/series'
+import { toTypedSchema } from '@/validation/toTypedSchema'
+import { optionalInteger, optionalString, requiredString } from '@/validation/schemas'
+import BaseInput from '@/components/base/BaseInput.vue'
+import BaseSelect from '@/components/base/BaseSelect.vue'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
 
 const props = defineProps<{
@@ -22,106 +28,61 @@ const { data: seriesList } = useQuery({
   staleTime: Infinity,
 })
 
-const seriesOptions = computed(() => [
-  { label: 'Nessuna serie', value: '' },
-  ...(seriesList.value ?? [])
+const seriesOptions = computed(() =>
+  (seriesList.value ?? [])
     .filter((s) => !s.deleted_at)
     .map((s) => ({ label: s.name, value: String(s.id) })),
-])
+)
 
-// FormKit restituisce stringhe: qui si converte nel payload atteso dall'API
-function toNumber(value: unknown): number | undefined {
-  if (value === '' || value === null || value === undefined) return undefined
-  const n = Number(value)
-  return Number.isFinite(n) ? n : undefined
-}
+const isCreate = props.variant === 'create'
 
-function handleSubmit(data: Record<string, unknown>) {
-  emit('submit', {
-    name: String(data.name ?? ''),
-    tcgdex_id: data.tcgdex_id ? String(data.tcgdex_id) : undefined,
-    series_id: toNumber(data.series_id) ?? null,
-    release_date: data.release_date ? String(data.release_date) : null,
-    card_count_official: toNumber(data.card_count_official),
-    card_count_total: toNumber(data.card_count_total),
-  })
-}
+const { handleSubmit } = useForm({
+  validationSchema: toTypedSchema(
+    z.object({
+      name: requiredString('Il nome è obbligatorio'),
+      // Obbligatorio solo in creazione, come in SetRequest lato API
+      tcgdex_id: isCreate
+        ? requiredString("L'ID TCGdex è obbligatorio")
+        : optionalString().transform((v) => v || undefined),
+      series_id: optionalString().transform((v) => (v ? Number(v) : null)),
+      release_date: optionalString().transform((v) => v || null),
+      card_count_official: optionalInteger(),
+      card_count_total: optionalInteger(),
+    }),
+  ),
+  initialValues: {
+    name: props.set?.name ?? '',
+    tcgdex_id: props.set?.tcgdex_id ?? '',
+    series_id: props.set?.series_id ? String(props.set.series_id) : '',
+    release_date: props.set?.release_date ?? '',
+    card_count_official: props.set?.card_count_official,
+    card_count_total: props.set?.card_count_total,
+  },
+})
+
+const onSubmit = handleSubmit((values) => emit('submit', values))
 </script>
 
 <template>
   <ErrorAlert :errors="errors ?? []" />
-  <FormKit
-    type="form"
-    id="set-form"
-    :actions="false"
-    :value="
-      props.set
-        ? {
-            name: props.set.name,
-            tcgdex_id: props.set.tcgdex_id,
-            series_id: props.set.series_id ? String(props.set.series_id) : '',
-            release_date: props.set.release_date,
-            card_count_official: props.set.card_count_official,
-            card_count_total: props.set.card_count_total,
-          }
-        : undefined
-    "
-    @submit="handleSubmit"
-  >
+  <form id="set-form" novalidate @submit="onSubmit">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4">
-      <FormKit
-        type="text"
-        name="name"
-        label="Nome"
-        placeholder="Es. Sword & Shield"
-        validation="required"
-        validation-visibility="dirty"
-        :validation-messages="{ required: 'Il nome è obbligatorio' }"
-        message-class="text-error text-sm mt-1"
-        outer-class="max-w-full"
-      />
-      <FormKit
-        type="text"
-        name="tcgdex_id"
-        label="ID TCGdex"
-        placeholder="Es. swsh1"
-        :validation="variant === 'create' ? 'required' : ''"
-        validation-visibility="dirty"
-        :validation-messages="{ required: 'L\'ID TCGdex è obbligatorio' }"
-        message-class="text-error text-sm mt-1"
-        outer-class="max-w-full"
-      />
-      <FormKit
-        type="select"
+      <BaseInput name="name" label="Nome" placeholder="Es. Sword & Shield" required />
+      <BaseInput name="tcgdex_id" label="ID TCGdex" placeholder="Es. swsh1" :required="isCreate" />
+      <BaseSelect
         name="series_id"
         label="Serie"
         :options="seriesOptions"
-        message-class="text-error text-sm mt-1"
-        outer-class="max-w-full"
+        placeholder="Nessuna serie"
       />
-      <FormKit
-        type="date"
-        name="release_date"
-        label="Data di uscita"
-        message-class="text-error text-sm mt-1"
-        outer-class="max-w-full"
-      />
-      <FormKit
-        type="number"
+      <BaseInput name="release_date" type="date" label="Data di uscita" />
+      <BaseInput
         name="card_count_official"
+        type="number"
         label="Carte ufficiali"
         placeholder="Es. 202"
-        message-class="text-error text-sm mt-1"
-        outer-class="max-w-full"
       />
-      <FormKit
-        type="number"
-        name="card_count_total"
-        label="Carte totali"
-        placeholder="Es. 216"
-        message-class="text-error text-sm mt-1"
-        outer-class="max-w-full"
-      />
+      <BaseInput name="card_count_total" type="number" label="Carte totali" placeholder="Es. 216" />
     </div>
-  </FormKit>
+  </form>
 </template>

@@ -1,0 +1,43 @@
+/* Campi dei form (BaseInput, BaseSelect, OtpInput): classi .app-field-control e .field-message.
+   Solo variabili daisyUI, niente colori fissi. */
+
+.app-field-control:focus-within,
+.app-field-control:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--color-primary) 40%, transparent);
+}
+
+.app-field-control.is-invalid {
+  border-color: var(--color-error);
+}
+
+.app-field-control.is-invalid:focus-within,
+.app-field-control.is-invalid:focus {
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--color-error) 40%, transparent);
+}
+
+.field-message {
+  color: var(--color-error);
+  margin-top: 0.375rem;
+  animation: field-shake 0.4s ease;
+}
+
+@keyframes field-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field-message {
+    animation: none;
+  }
+}

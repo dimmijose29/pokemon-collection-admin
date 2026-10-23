@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SearchInput from '@/components/shared/SearchInput.vue'
 import { RefreshCw, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
 defineProps<{
@@ -26,14 +27,7 @@ const search = defineModel<string>('search', { default: '' })
       <!-- Riga ricerca + refresh -->
       <div class="flex items-center gap-2 w-full">
         <div class="flex-1">
-          <FormKit
-            type="text"
-            prefix-icon="search"
-            outer-class="!mb-0 max-w-full"
-            input-class="outline-0"
-            v-model="search"
-            :placeholder="searchPlaceholder ?? 'Cerca...'"
-          />
+          <SearchInput v-model="search" :placeholder="searchPlaceholder ?? 'Cerca...'" />
         </div>
 
         <!-- Azioni (es. pulsante crea) -->

@@ -21,30 +21,34 @@ function submit() {
     </p>
 
     <div class="flex items-end gap-2 flex-wrap">
-      <FormKit
-        v-model="password"
-        type="password"
-        name="password"
-        label="Password"
-        autocomplete="current-password"
-        placeholder="••••••••"
-        outer-class="mb-0 max-w-[220px]"
-        @keydown.enter.prevent="submit"
-      />
-      <FormKit
-        v-model="code"
-        type="text"
-        name="code"
-        label="Codice 2FA"
-        inputmode="numeric"
-        maxlength="6"
-        placeholder="000000"
-        outer-class="mb-0 max-w-[160px]"
-        input-class="font-mono tracking-[0.3em] text-center"
-        @keydown.enter.prevent="submit"
-      />
+      <label class="flex flex-col gap-1 max-w-[220px]">
+        <span class="text-sm font-medium">Password</span>
+        <input
+          v-model="password"
+          type="password"
+          name="password"
+          autocomplete="current-password"
+          placeholder="••••••••"
+          class="input app-field-control"
+          @keydown.enter.prevent="submit"
+        />
+      </label>
+      <label class="flex flex-col gap-1 max-w-[160px]">
+        <span class="text-sm font-medium">Codice 2FA</span>
+        <input
+          v-model="code"
+          type="text"
+          name="code"
+          inputmode="numeric"
+          maxlength="6"
+          autocomplete="one-time-code"
+          placeholder="000000"
+          class="input app-field-control font-mono tracking-[0.3em] text-center"
+          @keydown.enter.prevent="submit"
+        />
+      </label>
 
-      <div class="flex gap-2 pb-5">
+      <div class="flex gap-2">
         <button
           type="button"
           class="btn btn-sm btn-error"

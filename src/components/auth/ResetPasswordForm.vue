@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useForm } from 'vee-validate'
+import { z } from 'zod'
+import { toTypedSchema } from '@/validation/toTypedSchema'
+import { passwordField, requiredString, validationMessages } from '@/validation/schemas'
+import BaseInput from '@/components/base/BaseInput.vue'
 import { resetPassword } from '@/api/auth'
 import { useErrorList } from '@/composables/useErrorList'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
@@ -16,23 +21,33 @@ const { allErrors, setErrors, clearErrors } = useErrorList()
 const loading = ref(false)
 const done = ref(false)
 
-async function handleSubmit(data: Record<string, unknown>) {
+const { handleSubmit } = useForm({
+  validationSchema: toTypedSchema(
+    z
+      .object({
+        password: passwordField(8, 'Campo obbligatorio'),
+        password_confirmation: requiredString('Campo obbligatorio'),
+      })
+      .refine((v) => v.password === v.password_confirmation, {
+        message: validationMessages.confirm,
+        path: ['password_confirmation'],
+      }),
+  ),
+  initialValues: { password: '', password_confirmation: '' },
+})
+
+const onSubmit = handleSubmit(async (data) => {
   loading.value = true
   clearErrors()
   try {
-    await resetPassword({
-      token: token.value,
-      email: email.value,
-      password: data.password as string,
-      password_confirmation: data.password_confirmation as string,
-    })
+    await resetPassword({ token: token.value, email: email.value, ...data })
     done.value = true
   } catch (e) {
     setErrors(e)
   } finally {
     loading.value = false
   }
-}
+})
 </script>
 
 <template>
@@ -74,32 +89,22 @@ async function handleSubmit(data: Record<string, unknown>) {
 
         <ErrorAlert :errors="allErrors" />
 
-        <FormKit type="form" :actions="false" @submit="handleSubmit">
-          <FormKit
-            type="password"
+        <form novalidate @submit="onSubmit">
+          <BaseInput
             name="password"
+            type="password"
             label="Nuova password"
             placeholder="••••••••"
             autocomplete="new-password"
-            validation="required|length:8"
-            validation-visibility="dirty"
-            :validation-messages="{
-              required: 'Campo obbligatorio',
-              length: 'Minimo 8 caratteri',
-            }"
+            required
           />
-          <FormKit
-            type="password"
+          <BaseInput
             name="password_confirmation"
+            type="password"
             label="Conferma password"
             placeholder="••••••••"
             autocomplete="new-password"
-            validation="required|confirm:password"
-            validation-visibility="dirty"
-            :validation-messages="{
-              required: 'Campo obbligatorio',
-              confirm: 'Le password non coincidono',
-            }"
+            required
           />
 
           <button
@@ -110,7 +115,7 @@ async function handleSubmit(data: Record<string, unknown>) {
             <span v-if="loading" class="loading loading-spinner loading-sm"></span>
             Reimposta password
           </button>
-        </FormKit>
+        </form>
 
         <div class="text-center mt-4">
           <RouterLink to="/" class="link link-hover text-sm text-base-content/60">

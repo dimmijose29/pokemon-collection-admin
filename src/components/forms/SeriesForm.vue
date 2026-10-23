@@ -1,54 +1,48 @@
 <script setup lang="ts">
-import type { Series } from '@/types/series'
+import { useForm } from 'vee-validate'
+import { z } from 'zod'
+import type { Series, SeriesPayload } from '@/types/series'
+import { toTypedSchema } from '@/validation/toTypedSchema'
+import { optionalString, requiredString } from '@/validation/schemas'
+import BaseInput from '@/components/base/BaseInput.vue'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
 
-defineProps<{
+const props = defineProps<{
   series?: Series | null
   variant?: 'create' | 'edit'
   errors?: string[]
 }>()
 
 const emit = defineEmits<{
-  submit: [data: Record<string, unknown>]
+  submit: [data: SeriesPayload]
 }>()
+
+// I campi facoltativi vuoti diventano null: l'API li salva come assenti
+const emptyToNull = () => optionalString().transform((v) => v || null)
+
+const { handleSubmit } = useForm({
+  validationSchema: toTypedSchema(
+    z.object({
+      name: requiredString('Il nome è obbligatorio'),
+      tcgdex_id: emptyToNull(),
+      logo_url: emptyToNull(),
+    }),
+  ),
+  initialValues: {
+    name: props.series?.name ?? '',
+    tcgdex_id: props.series?.tcgdex_id ?? '',
+    logo_url: props.series?.logo_url ?? '',
+  },
+})
+
+const onSubmit = handleSubmit((values) => emit('submit', values))
 </script>
 
 <template>
   <ErrorAlert :errors="errors ?? []" />
-  <FormKit
-    type="form"
-    id="series-form"
-    :actions="false"
-    :value="
-      series
-        ? { name: series.name, tcgdex_id: series.tcgdex_id ?? '', logo_url: series.logo_url ?? '' }
-        : undefined
-    "
-    @submit="(data) => emit('submit', data)"
-  >
-    <FormKit
-      type="text"
-      name="name"
-      label="Nome"
-      placeholder="Es. Sword & Shield"
-      validation="required"
-      validation-visibility="dirty"
-      :validation-messages="{ required: 'Il nome è obbligatorio' }"
-      outer-class="max-w-full"
-    />
-    <FormKit
-      type="text"
-      name="tcgdex_id"
-      label="TCGdex ID"
-      placeholder="Es. swsh (opzionale)"
-      outer-class="max-w-full"
-    />
-    <FormKit
-      type="text"
-      name="logo_url"
-      label="URL Logo"
-      placeholder="https://assets.tcgdex.net/..."
-      outer-class="max-w-full"
-    />
-  </FormKit>
+  <form id="series-form" novalidate @submit="onSubmit">
+    <BaseInput name="name" label="Nome" placeholder="Es. Sword & Shield" required />
+    <BaseInput name="tcgdex_id" label="TCGdex ID" placeholder="Es. swsh (opzionale)" />
+    <BaseInput name="logo_url" label="URL Logo" placeholder="https://assets.tcgdex.net/..." />
+  </form>
 </template>

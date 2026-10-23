@@ -1,37 +1,41 @@
 <script setup lang="ts">
+import { useForm } from 'vee-validate'
+import { z } from 'zod'
 import type { Artist } from '@/types/artist'
+import type { ArtistPayload } from '@/api/artists'
+import { toTypedSchema } from '@/validation/toTypedSchema'
+import { requiredString } from '@/validation/schemas'
+import BaseInput from '@/components/base/BaseInput.vue'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
 
-defineProps<{
+const props = defineProps<{
   artist?: Artist | null
   variant?: 'create' | 'edit'
   errors?: string[]
 }>()
 
 const emit = defineEmits<{
-  submit: [data: Record<string, unknown>]
+  submit: [data: ArtistPayload]
 }>()
+
+const { handleSubmit } = useForm({
+  validationSchema: toTypedSchema(
+    z.object({
+      name: requiredString('Il nome è obbligatorio'),
+    }),
+  ),
+  initialValues: {
+    name: props.artist?.name ?? '',
+  },
+})
+
+// Il pulsante Salva sta nel footer della modale e invia questo form tramite l'id
+const onSubmit = handleSubmit((values) => emit('submit', values))
 </script>
 
 <template>
   <ErrorAlert :errors="errors ?? []" />
-  <FormKit
-    type="form"
-    id="artist-form"
-    :actions="false"
-    :value="artist ? { name: artist.name } : undefined"
-    @submit="(data) => emit('submit', data)"
-  >
-    <FormKit
-      type="text"
-      name="name"
-      label="Nome"
-      placeholder="Es. Mitsuhiro Arita"
-      validation="required"
-      validation-visibility="dirty"
-      :validation-messages="{ required: 'Il nome è obbligatorio' }"
-      message-class="text-error text-sm mt-1"
-      outer-class="max-w-full"
-    />
-  </FormKit>
+  <form id="artist-form" novalidate @submit="onSubmit">
+    <BaseInput name="name" label="Nome" placeholder="Es. Mitsuhiro Arita" required />
+  </form>
 </template>

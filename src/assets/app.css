@@ -1,8 +1,6 @@
 @import './styles/_fonts.css';
-@import './styles/_formkit.css';
+@import './styles/_forms.css';
 @import './styles/_animations.css';
-@source "/formkit.theme.ts";
-@source "/formkit.config.ts";
 @import 'tailwindcss';
 @plugin 'daisyui';
 @plugin "daisyui/theme" {
