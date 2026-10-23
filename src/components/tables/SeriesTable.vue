@@ -1,89 +1,47 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useRouter } from 'vue-router'
 import { LayoutList } from 'lucide-vue-next'
 import AppTable from '@/components/app/AppTable.vue'
 import ActionColumn from '@/components/shared/ActionColumn.vue'
 import StatusFilter from '@/components/shared/StatusFilter.vue'
-import type { StatusFilterValue } from '@/components/shared/StatusFilter.vue'
 import SortableHeader from '@/components/shared/SortableHeader.vue'
-import type { SortState } from '@/components/shared/SortableHeader.vue'
 import AppLoading from '@/components/app/AppLoading.vue'
 import { formatDate } from '@/utils/dates'
-import { filterBySearch } from '@/utils/search'
 import { useModalStore } from '@/stores/modal'
-import { useToast } from '@/composables/useToast'
+import { useCrudTable } from '@/composables/useCrudTable'
 import SeriesApi from '@/api/series'
-import type { Series } from '@/types/series'
 
 const modalStore = useModalStore()
-const queryClient = useQueryClient()
 const router = useRouter()
-const { show } = useToast()
 
-const search = ref('')
-const statusFilter = ref<StatusFilterValue>('active')
-const sort = ref<SortState | null>(null)
-
-const { data, isLoading, isFetching, refetch } = useQuery({
-  queryKey: ['series', { withTrashed: true }],
-  queryFn: () => SeriesApi.get({ withTrashed: true }),
-  staleTime: Infinity,
-  placeholderData: (prev) => prev,
-})
-
-const allSeries = computed(() => data.value ?? [])
-
-const filtered = computed(() => {
-  let list = allSeries.value
-  if (statusFilter.value === 'active') list = list.filter((s) => !s.deleted_at)
-  else if (statusFilter.value === 'deleted') list = list.filter((s) => !!s.deleted_at)
-  return filterBySearch(list, search.value, {
+const {
+  search,
+  statusFilter,
+  sort,
+  rows,
+  total,
+  isLoading,
+  isFetching,
+  refetch,
+  remove,
+  restore,
+  isMutating,
+} = useCrudTable({
+  api: SeriesApi,
+  queryKey: 'series',
+  messages: { removed: 'Serie eliminata', restored: 'Serie ripristinata' },
+  search: {
     excludeKeys: ['deleted_at', 'logo_url'],
     transformers: { created_at: (v) => formatDate(v as string) },
-  })
-})
-
-const sorted = computed(() => {
-  if (!sort.value) return filtered.value
-  const { field, direction } = sort.value
-  const mult = direction === 'asc' ? 1 : -1
-  return [...filtered.value].sort((a, b) => {
-    if (field === 'sets_count') return ((a.sets_count ?? 0) - (b.sets_count ?? 0)) * mult
-    if (field === 'created_at')
-      return (new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) * mult
-    return (
-      String(a[field as keyof Series] ?? '').localeCompare(String(b[field as keyof Series] ?? '')) *
-      mult
-    )
-  })
-})
-
-const { mutate: remove, isPending: isRemoving } = useMutation({
-  mutationFn: (id: number) => SeriesApi.remove(id),
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['series'] })
-    show('Serie eliminata', 'error')
   },
 })
-
-const { mutate: restore, isPending: isRestoring } = useMutation({
-  mutationFn: (id: number) => SeriesApi.restore(id),
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['series'] })
-    show('Serie ripristinata')
-  },
-})
-
-const isMutating = computed(() => isRemoving.value || isRestoring.value)
 </script>
 
 <template>
   <AppTable
     v-model:search="search"
     search-placeholder="Cerca serie..."
-    :total="sorted.length"
+    :total="total"
     :loading="isLoading || isFetching"
     :refreshing="isFetching"
     @refresh="refetch()"
@@ -127,7 +85,7 @@ const isMutating = computed(() => isRemoving.value || isRestoring.value)
     </template>
 
     <template #body>
-      <tr v-for="series in sorted" :key="series.id" class="hover">
+      <tr v-for="series in rows" :key="series.id" class="hover">
         <!-- Logo -->
         <td>
           <img

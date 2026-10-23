@@ -14,14 +14,17 @@ const emit = defineEmits<{
 }>()
 
 const isRendered = ref(props.modelValue)
+let hideTimer: ReturnType<typeof setTimeout> | undefined
 
 watch(
   () => props.modelValue,
   (open) => {
+    // Senza clearTimeout, riaprire durante l'animazione di chiusura nascondeva la modale
+    clearTimeout(hideTimer)
     if (open) {
       isRendered.value = true
     } else {
-      setTimeout(() => {
+      hideTimer = setTimeout(() => {
         isRendered.value = false
       }, 250)
     }

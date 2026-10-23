@@ -1,47 +1,39 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Save } from 'lucide-vue-next'
 import { useModalStore } from '@/stores/modal'
-import { useGradingCompanyModal } from '@/composables/useGradingCompanyModal'
-import AppModal from '@/components/app/AppModal.vue'
+import { useCrudModal } from '@/composables/useCrudModal'
+import CrudModal from '@/components/app/CrudModal.vue'
 import GradingCompanyForm from '@/components/forms/GradingCompanyForm.vue'
+import GradingCompanies from '@/api/grading-companies'
 import type { GradingCompany } from '@/types/grading-company'
 
-const modalStore = useModalStore()
-const { handleSubmit, loading, allErrors } = useGradingCompanyModal()
+const { handleSubmit, loading, allErrors } = useCrudModal({
+  api: GradingCompanies,
+  queryKey: 'grading-companies',
+  messages: {
+    created: 'Compagnia di grading creata con successo',
+    updated: 'Compagnia di grading aggiornata con successo',
+  },
+})
 
-const currentGradingCompany = computed(() => modalStore.currentData as GradingCompany | null)
-const title = computed(() =>
-  modalStore.mode === 'create' ? 'Nuova compagnia di grading' : 'Modifica compagnia di grading',
-)
-const btnClass = computed(() => (modalStore.mode === 'create' ? 'btn-secondary' : 'btn-success'))
+const modalStore = useModalStore()
+const current = computed(() => modalStore.currentData as GradingCompany | null)
 </script>
 
 <template>
-  <AppModal
-    :model-value="modalStore.isOpen"
-    :title="title"
-    :variant="modalStore.mode"
+  <CrudModal
+    title-create="Nuova compagnia di grading"
+    title-edit="Modifica compagnia di grading"
+    form-id="grading-company-form"
     :loading="loading"
-    @update:model-value="modalStore.close()"
   >
-    <GradingCompanyForm
-      :grading-company="currentGradingCompany"
-      :variant="modalStore.mode"
-      :errors="allErrors"
-      @submit="handleSubmit"
-    />
-
-    <template #footer>
-      <button
-        type="submit"
-        form="grading-company-form"
-        class="btn btn-sm"
-        :class="[btnClass, { loading: loading }]"
-        :disabled="loading"
-      >
-        <Save class="w-4 h-4" /> Salva
-      </button>
+    <template #default="{ mode }">
+      <GradingCompanyForm
+        :grading-company="current"
+        :variant="mode"
+        :errors="allErrors"
+        @submit="handleSubmit"
+      />
     </template>
-  </AppModal>
+  </CrudModal>
 </template>

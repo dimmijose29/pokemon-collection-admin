@@ -1,45 +1,31 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Save } from 'lucide-vue-next'
 import { useModalStore } from '@/stores/modal'
-import { useArtistModal } from '@/composables/useArtistModal'
-import AppModal from '@/components/app/AppModal.vue'
+import { useCrudModal } from '@/composables/useCrudModal'
+import CrudModal from '@/components/app/CrudModal.vue'
 import ArtistForm from '@/components/forms/ArtistForm.vue'
+import Artists from '@/api/artists'
 import type { Artist } from '@/types/artist'
 
-const modalStore = useModalStore()
-const { handleSubmit, loading, allErrors } = useArtistModal()
+const { handleSubmit, loading, allErrors } = useCrudModal({
+  api: Artists,
+  queryKey: 'artists',
+  messages: { created: 'Artista creato con successo', updated: 'Artista aggiornato con successo' },
+})
 
-const currentArtist = computed(() => modalStore.currentData as Artist | null)
-const title = computed(() => (modalStore.mode === 'create' ? 'Nuovo artista' : 'Modifica artista'))
-const btnClass = computed(() => (modalStore.mode === 'create' ? 'btn-secondary' : 'btn-success'))
+const modalStore = useModalStore()
+const current = computed(() => modalStore.currentData as Artist | null)
 </script>
 
 <template>
-  <AppModal
-    :model-value="modalStore.isOpen"
-    :title="title"
-    :variant="modalStore.mode"
+  <CrudModal
+    title-create="Nuovo artista"
+    title-edit="Modifica artista"
+    form-id="artist-form"
     :loading="loading"
-    @update:model-value="modalStore.close()"
   >
-    <ArtistForm
-      :artist="currentArtist"
-      :variant="modalStore.mode"
-      :errors="allErrors"
-      @submit="handleSubmit"
-    />
-
-    <template #footer>
-      <button
-        type="submit"
-        form="artist-form"
-        class="btn btn-sm"
-        :class="[btnClass, { loading: loading }]"
-        :disabled="loading"
-      >
-        <Save class="w-4 h-4" /> Salva
-      </button>
+    <template #default="{ mode }">
+      <ArtistForm :artist="current" :variant="mode" :errors="allErrors" @submit="handleSubmit" />
     </template>
-  </AppModal>
+  </CrudModal>
 </template>

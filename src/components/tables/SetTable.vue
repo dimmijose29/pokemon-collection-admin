@@ -1,89 +1,59 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { LayoutList } from 'lucide-vue-next'
 import { useRouter, useRoute } from 'vue-router'
 import AppTable from '@/components/app/AppTable.vue'
 import ActionColumn from '@/components/shared/ActionColumn.vue'
 import StatusFilter from '@/components/shared/StatusFilter.vue'
-import type { StatusFilterValue } from '@/components/shared/StatusFilter.vue'
 import SortableHeader from '@/components/shared/SortableHeader.vue'
-import type { SortState } from '@/components/shared/SortableHeader.vue'
 import FilterSelect from '@/components/shared/FilterSelect.vue'
 import AppLoading from '@/components/app/AppLoading.vue'
 import { formatDate } from '@/utils/dates'
-import { filterBySearch } from '@/utils/search'
 import { useModalStore } from '@/stores/modal'
-import { useToast } from '@/composables/useToast'
+import { useCrudTable } from '@/composables/useCrudTable'
 import Sets from '@/api/sets'
-import type { Set } from '@/types/set'
 
 const modalStore = useModalStore()
-const queryClient = useQueryClient()
-const { show } = useToast()
 const router = useRouter()
 const route = useRoute()
 
-const search = ref('')
-const statusFilter = ref<StatusFilterValue>('active')
 const seriesFilter = ref<string[]>([])
-const sort = ref<SortState | null>(null)
 
-const { data, isLoading, isFetching, refetch } = useQuery({
-  queryKey: ['sets', { withTrashed: true }],
-  queryFn: () => Sets.get({ withTrashed: true }),
-  staleTime: Infinity,
-  placeholderData: (prev) => prev,
+const {
+  search,
+  statusFilter,
+  sort,
+  all,
+  rows,
+  total,
+  isLoading,
+  isFetching,
+  refetch,
+  remove,
+  restore,
+  isMutating,
+} = useCrudTable({
+  api: Sets,
+  queryKey: 'sets',
+  messages: { removed: 'Set eliminato', restored: 'Set ripristinato' },
+  search: {
+    excludeKeys: ['deleted_at', 'symbol_url', 'logo_url', 'tcgdex_id', 'series_id'],
+    transformers: { release_date: (v) => (v ? formatDate(v as string) : '') },
+  },
+  filter: (list) =>
+    seriesFilter.value.length
+      ? list.filter((s) => s.series?.name && seriesFilter.value.includes(s.series.name))
+      : list,
+  sorters: {
+    series: (a, b) => (a.series?.name ?? '').localeCompare(b.series?.name ?? ''),
+  },
 })
 
-const allSets = computed(() => data.value ?? [])
-
-// Lista serie univoche per il filtro (nomi)
+// Nomi delle serie presenti, per il filtro
 const seriesList = computed(() => {
-  const names = new Set(allSets.value.map((s) => s.series?.name).filter(Boolean) as string[])
+  const names = new Set(all.value.map((s) => s.series?.name).filter(Boolean) as string[])
   return [...names].sort()
 })
-
-const sets = computed(() => {
-  let filtered = allSets.value
-
-  if (statusFilter.value === 'active') {
-    filtered = filtered.filter((s) => !s.deleted_at)
-  } else if (statusFilter.value === 'deleted') {
-    filtered = filtered.filter((s) => !!s.deleted_at)
-  }
-
-  if (seriesFilter.value.length) {
-    filtered = filtered.filter((s) => s.series?.name && seriesFilter.value.includes(s.series.name))
-  }
-
-  return filterBySearch(filtered, search.value, {
-    excludeKeys: ['deleted_at', 'symbol_url', 'logo_url', 'tcgdex_id', 'series_id'],
-    transformers: {
-      release_date: (v) => (v ? formatDate(v as string) : ''),
-    },
-  })
-})
-
-const total = computed(() => sets.value.length)
-
-const { mutate: remove, isPending: isRemoving } = useMutation({
-  mutationFn: (id: number) => Sets.remove(id),
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['sets'] })
-    show('Set eliminato', 'error')
-  },
-})
-
-const { mutate: restore, isPending: isRestoring } = useMutation({
-  mutationFn: (id: number) => Sets.restore(id),
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['sets'] })
-    show('Set ripristinato')
-  },
-})
-
-const isMutating = computed(() => isRemoving.value || isRestoring.value)
 
 // Pre-popola il filtro serie dal query param (es. navigando da SeriesTable → "Vedi set")
 onMounted(() => {
@@ -91,27 +61,6 @@ onMounted(() => {
   if (q) {
     seriesFilter.value = Array.isArray(q) ? (q.filter(Boolean) as string[]) : [q as string]
   }
-})
-
-const sortedSets = computed(() => {
-  if (!sort.value) return sets.value
-  const { field, direction } = sort.value
-  const mult = direction === 'asc' ? 1 : -1
-  return [...sets.value].sort((a, b) => {
-    if (field === 'card_count_official')
-      return ((a.card_count_official ?? 0) - (b.card_count_official ?? 0)) * mult
-    if (field === 'release_date') {
-      const aD = a.release_date ? new Date(a.release_date).getTime() : 0
-      const bD = b.release_date ? new Date(b.release_date).getTime() : 0
-      return (aD - bD) * mult
-    }
-    if (field === 'series') return (a.series?.name ?? '').localeCompare(b.series?.name ?? '') * mult
-    return (
-      String(a[field as keyof typeof a] ?? '').localeCompare(
-        String(b[field as keyof typeof b] ?? ''),
-      ) * mult
-    )
-  })
 })
 </script>
 
@@ -169,7 +118,7 @@ const sortedSets = computed(() => {
     </template>
 
     <template #body>
-      <tr v-for="set in sortedSets" :key="set.id" class="hover">
+      <tr v-for="set in rows" :key="set.id" class="hover">
         <!-- Logo -->
         <td>
           <img

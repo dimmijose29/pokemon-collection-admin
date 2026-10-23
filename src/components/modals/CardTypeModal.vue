@@ -1,47 +1,39 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Save } from 'lucide-vue-next'
 import { useModalStore } from '@/stores/modal'
-import { useCardTypeModal } from '@/composables/useCardTypeModal'
-import AppModal from '@/components/app/AppModal.vue'
+import { useCrudModal } from '@/composables/useCrudModal'
+import CrudModal from '@/components/app/CrudModal.vue'
 import CardTypeForm from '@/components/forms/CardTypeForm.vue'
+import CardTypes from '@/api/card-types'
 import type { CardType } from '@/types/card-type'
 
-const modalStore = useModalStore()
-const { handleSubmit, loading, allErrors } = useCardTypeModal()
+const { handleSubmit, loading, allErrors } = useCrudModal({
+  api: CardTypes,
+  queryKey: 'card-types',
+  messages: {
+    created: 'Tipo carta creato con successo',
+    updated: 'Tipo carta aggiornato con successo',
+  },
+})
 
-const currentCardType = computed(() => modalStore.currentData as CardType | null)
-const title = computed(() =>
-  modalStore.mode === 'create' ? 'Nuovo tipo carta' : 'Modifica tipo carta',
-)
-const btnClass = computed(() => (modalStore.mode === 'create' ? 'btn-secondary' : 'btn-success'))
+const modalStore = useModalStore()
+const current = computed(() => modalStore.currentData as CardType | null)
 </script>
 
 <template>
-  <AppModal
-    :model-value="modalStore.isOpen"
-    :title="title"
-    :variant="modalStore.mode"
+  <CrudModal
+    title-create="Nuovo tipo carta"
+    title-edit="Modifica tipo carta"
+    form-id="card-type-form"
     :loading="loading"
-    @update:model-value="modalStore.close()"
   >
-    <CardTypeForm
-      :card-type="currentCardType"
-      :variant="modalStore.mode"
-      :errors="allErrors"
-      @submit="handleSubmit"
-    />
-
-    <template #footer>
-      <button
-        type="submit"
-        form="card-type-form"
-        class="btn btn-sm"
-        :class="[btnClass, { loading: loading }]"
-        :disabled="loading"
-      >
-        <Save class="w-4 h-4" /> Salva
-      </button>
+    <template #default="{ mode }">
+      <CardTypeForm
+        :card-type="current"
+        :variant="mode"
+        :errors="allErrors"
+        @submit="handleSubmit"
+      />
     </template>
-  </AppModal>
+  </CrudModal>
 </template>

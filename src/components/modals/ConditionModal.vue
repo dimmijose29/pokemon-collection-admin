@@ -1,47 +1,39 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Save } from 'lucide-vue-next'
 import { useModalStore } from '@/stores/modal'
-import { useConditionModal } from '@/composables/useConditionModal'
-import AppModal from '@/components/app/AppModal.vue'
+import { useCrudModal } from '@/composables/useCrudModal'
+import CrudModal from '@/components/app/CrudModal.vue'
 import ConditionForm from '@/components/forms/ConditionForm.vue'
+import Conditions from '@/api/conditions'
 import type { Condition } from '@/types/condition'
 
-const modalStore = useModalStore()
-const { handleSubmit, loading, allErrors } = useConditionModal()
+const { handleSubmit, loading, allErrors } = useCrudModal({
+  api: Conditions,
+  queryKey: 'conditions',
+  messages: {
+    created: 'Condizione creata con successo',
+    updated: 'Condizione aggiornata con successo',
+  },
+})
 
-const currentCondition = computed(() => modalStore.currentData as Condition | null)
-const title = computed(() =>
-  modalStore.mode === 'create' ? 'Nuova condizione' : 'Modifica condizione',
-)
-const btnClass = computed(() => (modalStore.mode === 'create' ? 'btn-secondary' : 'btn-success'))
+const modalStore = useModalStore()
+const current = computed(() => modalStore.currentData as Condition | null)
 </script>
 
 <template>
-  <AppModal
-    :model-value="modalStore.isOpen"
-    :title="title"
-    :variant="modalStore.mode"
+  <CrudModal
+    title-create="Nuova condizione"
+    title-edit="Modifica condizione"
+    form-id="condition-form"
     :loading="loading"
-    @update:model-value="modalStore.close()"
   >
-    <ConditionForm
-      :condition="currentCondition"
-      :variant="modalStore.mode"
-      :errors="allErrors"
-      @submit="handleSubmit"
-    />
-
-    <template #footer>
-      <button
-        type="submit"
-        form="condition-form"
-        class="btn btn-sm"
-        :class="[btnClass, { loading: loading }]"
-        :disabled="loading"
-      >
-        <Save class="w-4 h-4" /> Salva
-      </button>
+    <template #default="{ mode }">
+      <ConditionForm
+        :condition="current"
+        :variant="mode"
+        :errors="allErrors"
+        @submit="handleSubmit"
+      />
     </template>
-  </AppModal>
+  </CrudModal>
 </template>
