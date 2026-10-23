@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import axios from 'axios'
+import axios, { type AxiosResponse } from 'axios'
 import { useErrorList } from '@/composables/useErrorList'
 
 describe('useErrorList', () => {
@@ -40,7 +40,7 @@ describe('useErrorList', () => {
           code: ['Il codice è già in uso'],
         },
       },
-    } as any)
+    } as AxiosResponse)
 
     errorList.setErrors(axiosError)
 
@@ -54,7 +54,7 @@ describe('useErrorList', () => {
     const axiosError = new axios.AxiosError('Forbidden', '403', undefined, undefined, {
       status: 403,
       data: { message: 'Non autorizzato' },
-    } as any)
+    } as AxiosResponse)
 
     errorList.setErrors(axiosError)
 
@@ -68,7 +68,7 @@ describe('useErrorList', () => {
         message: 'Errore validazione',
         errors: { name: ['Il nome è obbligatorio'] },
       },
-    } as any)
+    } as AxiosResponse)
 
     errorList.setErrors(axiosError)
 
@@ -80,7 +80,7 @@ describe('useErrorList', () => {
     const axiosError = new axios.AxiosError('Not Found', '404', undefined, undefined, {
       status: 404,
       data: { message: 'Risorsa non trovata' },
-    } as any)
+    } as AxiosResponse)
 
     errorList.setErrors(axiosError)
 

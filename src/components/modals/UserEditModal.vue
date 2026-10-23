@@ -4,7 +4,7 @@ import AppModal from '@/components/app/AppModal.vue'
 import UserEditForm from '@/components/forms/UserEditForm.vue'
 import type { User } from '@/types/user'
 
-const props = defineProps<{
+defineProps<{
   modelValue: boolean
   user: User | null
   loading?: boolean

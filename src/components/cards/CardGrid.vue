@@ -6,7 +6,7 @@ import type { SortState } from '@/components/shared/SortableHeader.vue'
 import CardDetailModal from '@/components/modals/CardDetailModal.vue'
 import type { Card } from '@/types/card'
 import type { Set } from '@/types/set'
-import { getEnergyClass, getCardTypeClass, getStageClass, getEnergyStyle } from '@/utils/pokemon'
+import { getCardTypeClass, getStageClass, getEnergyStyle } from '@/utils/pokemon'
 import { cardName, formatPrice, setCode } from '@/utils/card'
 
 const props = defineProps<{

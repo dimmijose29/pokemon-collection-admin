@@ -42,7 +42,7 @@ const cardTypes = computed(() => {
   }
 
   return filterBySearch(filtered, search.value, {
-    excludeKeys: ['updated_at', 'deleted_at'],
+    excludeKeys: ['deleted_at'],
     transformers: {
       created_at: (v) => formatDate(v as string),
     },
@@ -113,7 +113,7 @@ const sortedCardTypes = computed(() => {
         <td>
           <ActionColumn
             :actions="cardType.deleted_at ? ['restore'] : ['edit', 'delete']"
-            @edit="modalStore.open(cardType as Record<string, unknown>)"
+            @edit="modalStore.open(cardType)"
             @delete="remove(cardType.id)"
             @restore="restore(cardType.id)"
           />

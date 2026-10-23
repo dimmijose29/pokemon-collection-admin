@@ -18,7 +18,6 @@ import { useUserModal } from '@/composables/useUserModal'
 import { useUserEditModal } from '@/composables/useUserEditModal'
 import { useAuthStore } from '@/stores/auth'
 import Users from '@/api/users'
-import type { User } from '@/types/user'
 
 const queryClient = useQueryClient()
 const { show } = useToast()

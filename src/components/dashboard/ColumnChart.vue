@@ -58,7 +58,7 @@ function buildChart() {
         tooltip: {
           bodyFont: { family: 'Manrope, system-ui, sans-serif' },
           callbacks: {
-            label: (ctx) => '  ' + ctx.parsed.y.toLocaleString('it-IT') + ' set',
+            label: (ctx) => '  ' + (ctx.parsed.y ?? 0).toLocaleString('it-IT') + ' set',
           },
         },
       },

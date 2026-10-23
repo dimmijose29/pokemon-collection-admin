@@ -8,7 +8,8 @@ type Transformer<T> = Partial<Record<keyof T, (value: unknown) => string>>
  * - transformers: funzioni per convertire un campo prima di cercarlo
  *   (es. formattare una data ISO in "gg/mm/aaaa")
  */
-export function filterBySearch<T extends Record<string, unknown>>(
+// `T extends object` (non Record<string, unknown>) così accetta anche le interface dei tipi entità
+export function filterBySearch<T extends object>(
   items: T[],
   query: string,
   options: {
@@ -19,7 +20,7 @@ export function filterBySearch<T extends Record<string, unknown>>(
   const q = query.trim().toLowerCase()
   if (!q) return items
 
-  const { excludeKeys = [], transformers = {} } = options
+  const { excludeKeys = [], transformers = {} as Transformer<T> } = options
 
   return items.filter((item) =>
     Object.entries(item).some(([key, value]) => {

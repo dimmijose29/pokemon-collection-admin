@@ -6,9 +6,10 @@ export type ModalMode = 'create' | 'edit'
 export const useModalStore = defineStore('modal', () => {
   const isOpen = ref(false)
   const mode = ref<ModalMode>('create')
-  const currentData = ref<Record<string, unknown> | null>(null)
+  // Entità in modifica; ogni modale la riconverte nel proprio tipo
+  const currentData = ref<object | null>(null)
 
-  function open(data: Record<string, unknown> | null = null) {
+  function open(data: object | null = null) {
     mode.value = data ? 'edit' : 'create'
     currentData.value = data
     isOpen.value = true

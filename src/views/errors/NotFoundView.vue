@@ -21,7 +21,7 @@ const sprite = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites
       </p>
       <div class="flex gap-3 justify-center">
         <button class="btn btn-secondary btn-lg" @click="router.back()">← Torna indietro</button>
-        <button class="btn btn-ghost btn-lg" @click="router.push({ name: 'login' })">Home</button>
+        <button class="btn btn-ghost btn-lg" @click="router.push({ name: 'dashboard' })">Home</button>
       </div>
     </div>
   </div>

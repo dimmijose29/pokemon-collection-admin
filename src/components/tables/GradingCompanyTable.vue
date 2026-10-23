@@ -42,7 +42,7 @@ const gradingCompanies = computed(() => {
   }
 
   return filterBySearch(filtered, search.value, {
-    excludeKeys: ['updated_at', 'deleted_at'],
+    excludeKeys: ['deleted_at'],
     transformers: {
       created_at: (v) => formatDate(v as string),
     },
@@ -112,7 +112,7 @@ const sortedGradingCompanies = computed(() => {
         <td>
           <ActionColumn
             :actions="company.deleted_at ? ['restore'] : ['edit', 'delete']"
-            @edit="modalStore.open(company as Record<string, unknown>)"
+            @edit="modalStore.open(company)"
             @delete="remove(company.id)"
             @restore="restore(company.id)"
           />

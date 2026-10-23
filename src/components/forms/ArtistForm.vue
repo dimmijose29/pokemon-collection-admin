@@ -2,7 +2,7 @@
 import type { Artist } from '@/types/artist'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
 
-const props = defineProps<{
+defineProps<{
   artist?: Artist | null
   variant?: 'create' | 'edit'
   errors?: string[]

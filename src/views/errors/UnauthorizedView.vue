@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
+const { logout } = useAuth()
+
+// Un utente loggato ma senza permessi va prima disconnesso, altrimenti il login lo rimanda qui
+async function goToLogin() {
+  await logout()
+  router.push({ name: 'login' })
+}
 
 // Pokémon a tema "accesso negato" — Gengar, Spiritomb, Sableye, Umbreon, Haunter
 const ids = [94, 442, 302, 197, 93]
@@ -20,7 +28,7 @@ const sprite = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites
         Effettua il login o contatta un amministratore.
       </p>
       <div class="flex gap-3 justify-center">
-        <button class="btn btn-secondary btn-lg" @click="router.push({ name: 'login' })">
+        <button class="btn btn-secondary btn-lg" @click="goToLogin">
           Vai al login
         </button>
         <button class="btn btn-ghost btn-lg" @click="router.back()">← Torna indietro</button>

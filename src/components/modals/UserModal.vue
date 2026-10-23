@@ -3,7 +3,7 @@ import { Save } from 'lucide-vue-next'
 import AppModal from '@/components/app/AppModal.vue'
 import UserCreateForm from '@/components/forms/UserCreateForm.vue'
 
-const props = defineProps<{
+defineProps<{
   modelValue: boolean
   loading?: boolean
   errors?: string[]

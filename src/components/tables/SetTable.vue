@@ -30,7 +30,7 @@ const seriesFilter = ref<string[]>([])
 const sort = ref<SortState | null>(null)
 
 const { data, isLoading, isFetching, refetch } = useQuery({
-  queryKey: ['sets'],
+  queryKey: ['sets', { withTrashed: true }],
   queryFn: () => Sets.get({ withTrashed: true }),
   staleTime: Infinity,
   placeholderData: (prev) => prev,
@@ -189,7 +189,7 @@ const sortedSets = computed(() => {
             </button>
             <ActionColumn
               :actions="set.deleted_at ? ['restore'] : ['edit', 'delete']"
-              @edit="modalStore.open(set as Record<string, unknown>)"
+              @edit="modalStore.open(set)"
               @delete="remove(set.id)"
               @restore="restore(set.id)"
             />

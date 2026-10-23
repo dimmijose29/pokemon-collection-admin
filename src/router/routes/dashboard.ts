@@ -18,7 +18,8 @@ export const dashboardRoutes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('@/layouts/admin/AdminPage.vue'),
-    meta: { requiresAuth: true },
+    // meta del padre: vale per tutte le pagine figlie
+    meta: { requiresAuth: true, requiresAdmin: true },
     children: [
       ...adminChildren,
       // Route con parametri — non possono stare in adminNav

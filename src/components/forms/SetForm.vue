@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import type { Set } from '@/types/set'
+import { computed } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
+import type { Set, SetPayload } from '@/types/set'
+import SeriesApi from '@/api/series'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
 
 const props = defineProps<{
@@ -9,8 +12,40 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  submit: [data: Record<string, unknown>]
+  submit: [data: SetPayload]
 }>()
+
+// Stessa chiave del filtro serie in CardsView: la cache è condivisa
+const { data: seriesList } = useQuery({
+  queryKey: ['series', { withTrashed: false }],
+  queryFn: () => SeriesApi.get(),
+  staleTime: Infinity,
+})
+
+const seriesOptions = computed(() => [
+  { label: 'Nessuna serie', value: '' },
+  ...(seriesList.value ?? [])
+    .filter((s) => !s.deleted_at)
+    .map((s) => ({ label: s.name, value: String(s.id) })),
+])
+
+// FormKit restituisce stringhe: qui si converte nel payload atteso dall'API
+function toNumber(value: unknown): number | undefined {
+  if (value === '' || value === null || value === undefined) return undefined
+  const n = Number(value)
+  return Number.isFinite(n) ? n : undefined
+}
+
+function handleSubmit(data: Record<string, unknown>) {
+  emit('submit', {
+    name: String(data.name ?? ''),
+    tcgdex_id: data.tcgdex_id ? String(data.tcgdex_id) : undefined,
+    series_id: toNumber(data.series_id) ?? null,
+    release_date: data.release_date ? String(data.release_date) : null,
+    card_count_official: toNumber(data.card_count_official),
+    card_count_total: toNumber(data.card_count_total),
+  })
+}
 </script>
 
 <template>
@@ -20,18 +55,18 @@ const emit = defineEmits<{
     id="set-form"
     :actions="false"
     :value="
-      set
+      props.set
         ? {
-            name: set.name,
-            tcgdex_id: set.tcgdex_id,
-            series: set.series,
-            release_date: set.release_date,
-            card_count_official: set.card_count_official,
-            card_count_total: set.card_count_total,
+            name: props.set.name,
+            tcgdex_id: props.set.tcgdex_id,
+            series_id: props.set.series_id ? String(props.set.series_id) : '',
+            release_date: props.set.release_date,
+            card_count_official: props.set.card_count_official,
+            card_count_total: props.set.card_count_total,
           }
         : undefined
     "
-    @submit="(data) => emit('submit', data)"
+    @submit="handleSubmit"
   >
     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4">
       <FormKit
@@ -50,14 +85,17 @@ const emit = defineEmits<{
         name="tcgdex_id"
         label="ID TCGdex"
         placeholder="Es. swsh1"
+        :validation="variant === 'create' ? 'required' : ''"
+        validation-visibility="dirty"
+        :validation-messages="{ required: 'L\'ID TCGdex è obbligatorio' }"
         message-class="text-error text-sm mt-1"
         outer-class="max-w-full"
       />
       <FormKit
-        type="text"
-        name="series"
+        type="select"
+        name="series_id"
         label="Serie"
-        placeholder="Es. Sword & Shield"
+        :options="seriesOptions"
         message-class="text-error text-sm mt-1"
         outer-class="max-w-full"
       />

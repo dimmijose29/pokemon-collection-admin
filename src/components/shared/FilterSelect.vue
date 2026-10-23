@@ -8,7 +8,7 @@ const props = defineProps<{
   multiple?: boolean
 }>()
 
-const model = defineModel<string | string[]>()
+const model = defineModel<string | string[] | null>()
 
 const isOpen       = ref(false)
 const searchQuery  = ref('')

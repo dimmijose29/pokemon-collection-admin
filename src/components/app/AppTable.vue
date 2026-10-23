@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RefreshCw, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
-const props = defineProps<{
+defineProps<{
   searchPlaceholder?: string
   total?: number
   loading?: boolean

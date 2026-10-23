@@ -42,7 +42,7 @@ const conditions = computed(() => {
   }
 
   return filterBySearch(filtered, search.value, {
-    excludeKeys: ['updated_at', 'deleted_at'],
+    excludeKeys: ['deleted_at'],
     transformers: {
       created_at: (v) => formatDate(v as string),
     },
@@ -117,7 +117,7 @@ const sortedConditions = computed(() => {
         <td>
           <ActionColumn
             :actions="condition.deleted_at ? ['restore'] : ['edit', 'delete']"
-            @edit="modalStore.open(condition as Record<string, unknown>)"
+            @edit="modalStore.open(condition)"
             @delete="remove(condition.id)"
             @restore="restore(condition.id)"
           />

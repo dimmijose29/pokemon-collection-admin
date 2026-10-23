@@ -42,7 +42,7 @@ const currencies = computed(() => {
   }
 
   return filterBySearch(filtered, search.value, {
-    excludeKeys: ['updated_at', 'deleted_at'],
+    excludeKeys: ['deleted_at'],
     transformers: {
       created_at: (v) => formatDate(v as string),
     },
@@ -117,7 +117,7 @@ const sortedCurrencies = computed(() => {
         <td>
           <ActionColumn
             :actions="currency.deleted_at ? ['restore'] : ['edit', 'delete']"
-            @edit="modalStore.open(currency as Record<string, unknown>)"
+            @edit="modalStore.open(currency)"
             @delete="remove(currency.id)"
             @restore="restore(currency.id)"
           />

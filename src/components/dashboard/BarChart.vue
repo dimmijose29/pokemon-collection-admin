@@ -25,6 +25,9 @@ const PALETTE = [
   'oklch(0.70 0.15 70)',   // gold
 ]
 
+// Il modulo garantisce un indice valido; `!` serve per noUncheckedIndexedAccess
+const paletteColor = (i: number) => PALETTE[i % PALETTE.length]!
+
 const props = defineProps<{
   data: ChartPoint[]
   title: string
@@ -53,8 +56,8 @@ function buildChart() {
       labels: d.map((i) => i.label),
       datasets: [{
         data: d.map((i) => i.value),
-        backgroundColor: d.map((_, i) => PALETTE[i % PALETTE.length].replace(')', ' / 0.82)')),
-        hoverBackgroundColor: d.map((_, i) => PALETTE[i % PALETTE.length]),
+        backgroundColor: d.map((_, i) => paletteColor(i).replace(')', ' / 0.82)')),
+        hoverBackgroundColor: d.map((_, i) => paletteColor(i)),
         borderRadius: 5,
         borderSkipped: false,
       }],
@@ -69,7 +72,10 @@ function buildChart() {
         tooltip: {
           bodyFont: { family: 'Manrope, system-ui, sans-serif' },
           callbacks: {
-            label: (ctx) => '  ' + (props.formatValue ? props.formatValue(ctx.parsed.x) : ctx.parsed.x.toLocaleString('it-IT')),
+            label: (ctx) => {
+              const value = ctx.parsed.x ?? 0
+              return '  ' + (props.formatValue ? props.formatValue(value) : value.toLocaleString('it-IT'))
+            },
           },
         },
       },

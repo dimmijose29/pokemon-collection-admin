@@ -19,7 +19,7 @@ const cardTypeFilter = ref<string[]>([])
 const energyFilter   = ref<string[]>([])
 
 const { data, isLoading, isFetching, refetch } = useQuery({
-  queryKey: ['cards', props.setId],
+  queryKey: ['cards', computed(() => props.setId)],
   queryFn: () => Cards.get({ set_id: props.setId }),
   staleTime: Infinity,
   placeholderData: (prev) => prev,

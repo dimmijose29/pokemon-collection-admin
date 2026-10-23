@@ -1,8 +1,9 @@
 import { ref } from 'vue'
+import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
 import { useErrorList } from '@/composables/useErrorList'
 import { login, verify2FA, logout as apiLogout } from '@/api/auth'
-import type { LoginCredentials } from '@/types/auth'
+import type { LoginCredentials, LoginSuccessResponse } from '@/types/auth'
 import { useQueryClient } from '@tanstack/vue-query'
 
 export function useAuth() {
@@ -12,6 +13,22 @@ export function useAuth() {
   const error = ref<string>('')
   const queryClient = useQueryClient()
 
+  // Il pannello è riservato agli admin: un utente normale viene disconnesso subito
+  // (anche il token appena emesso viene revocato lato server)
+  async function completeLogin(res: LoginSuccessResponse): Promise<string | null> {
+    store.setToken(res.token)
+
+    if (!res.user.is_admin) {
+      await apiLogout().catch(() => {})
+      store.clearAuth()
+      return 'Accesso riservato agli amministratori'
+    }
+
+    store.fillUser(res.user)
+    queryClient.clear()
+    return null
+  }
+
   async function attemptLogin(credentials: LoginCredentials) {
     loading.value = true
     error.value = ''
@@ -20,7 +37,8 @@ export function useAuth() {
       const res = await login(credentials)
 
       // Il backend ritorna two_factor_required in snake_case
-      if ('two_factor_required' in res && res.two_factor_required) {
+      // `in` da solo restringe il tipo: dopo il return `res` è LoginSuccessResponse
+      if ('two_factor_required' in res) {
         return {
           success: false,
           twoFactorRequired: true,
@@ -28,9 +46,8 @@ export function useAuth() {
         }
       }
 
-      store.setToken(res.token)
-      store.fillUser(res.user)
-      queryClient.clear()
+      const denied = await completeLogin(res)
+      if (denied) return { success: false, error: [denied] }
       return { success: true }
     } catch (err: unknown) {
       errorList.setErrors(err)
@@ -46,18 +63,12 @@ export function useAuth() {
 
     try {
       const res = await verify2FA(code, tempToken)
-      store.setToken(res.token)
-      store.fillUser(res.user)
-      queryClient.clear()
+      const denied = await completeLogin(res)
+      if (denied) return { success: false, error: denied }
       return { success: true }
     } catch (err: unknown) {
-      if (
-        err &&
-        typeof err === 'object' &&
-        'response' in err &&
-        (err as any).response?.data?.message
-      ) {
-        error.value = (err as any).response.data.message
+      if (axios.isAxiosError(err) && err.response?.data?.message) {
+        error.value = err.response.data.message
       } else if (err instanceof Error) {
         error.value = err.message || 'Codice 2FA non valido'
       } else {
@@ -72,7 +83,7 @@ export function useAuth() {
   async function logout() {
     try {
       await apiLogout()
-    } catch (err: unknown) {
+    } catch {
       console.warn('Logout API fallito, procedo localmente')
     }
     store.clearAuth()

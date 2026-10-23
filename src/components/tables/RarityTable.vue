@@ -107,7 +107,7 @@ const sortedRarities = computed(() => {
         <td>
           <ActionColumn
             :actions="rarity.deleted_at ? ['restore'] : ['edit', 'delete']"
-            @edit="modalStore.open(rarity as Record<string, unknown>)"
+            @edit="modalStore.open(rarity)"
             @delete="remove(rarity.id)"
             @restore="restore(rarity.id)"
           />

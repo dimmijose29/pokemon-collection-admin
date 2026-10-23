@@ -2,7 +2,7 @@
 import { Save } from 'lucide-vue-next'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
 
-const props = defineProps<{
+defineProps<{
   errors: string[]
   loading: boolean
 }>()

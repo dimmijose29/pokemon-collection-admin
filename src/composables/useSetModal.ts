@@ -20,16 +20,16 @@ export function useSetModal() {
     },
   )
 
-  async function handleSubmit(data: Record<string, unknown>) {
+  async function handleSubmit(data: SetPayload) {
     loading.value = true
     clearErrors()
     try {
       if (modalStore.mode === 'create') {
-        await Sets.create(data as SetPayload)
+        await Sets.create(data)
         show('Set creato con successo')
       } else {
         const set = modalStore.currentData as Set
-        await Sets.update(set.id, data as SetPayload)
+        await Sets.update(set.id, data)
         show('Set aggiornato con successo')
       }
       await queryClient.invalidateQueries({ queryKey: ['sets'] })

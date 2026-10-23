@@ -27,7 +27,7 @@ const statusFilter = ref<StatusFilterValue>('active')
 const sort         = ref<SortState | null>(null)
 
 const { data, isLoading, isFetching, refetch } = useQuery({
-  queryKey: ['series'],
+  queryKey: ['series', { withTrashed: true }],
   queryFn: () => SeriesApi.get({ withTrashed: true }),
   staleTime: Infinity,
   placeholderData: (prev) => prev,
@@ -145,7 +145,7 @@ const isMutating = computed(() => isRemoving.value || isRestoring.value)
             </button>
             <ActionColumn
               :actions="series.deleted_at ? ['restore'] : ['edit', 'delete']"
-              @edit="modalStore.open(series as Record<string, unknown>)"
+              @edit="modalStore.open(series)"
               @delete="remove(series.id)"
               @restore="restore(series.id)"
             />

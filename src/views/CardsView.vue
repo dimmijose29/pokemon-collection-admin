@@ -71,13 +71,13 @@ function resetFilters() {
 
 // --- Query dati filtro ---
 const { data: seriesList } = useQuery({
-  queryKey: ['series'],
+  queryKey: ['series', { withTrashed: false }],
   queryFn: () => SeriesApi.get(),
   staleTime: Infinity,
 })
 
 const { data: setsList } = useQuery({
-  queryKey: ['sets'],
+  queryKey: ['sets', { withTrashed: false }],
   queryFn: () => Sets.get(),
   staleTime: Infinity,
 })

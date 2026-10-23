@@ -2,7 +2,7 @@
 import type { Series } from '@/types/series'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
 
-const props = defineProps<{
+defineProps<{
   series?: Series | null
   variant?: 'create' | 'edit'
   errors?: string[]

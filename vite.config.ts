@@ -1,6 +1,7 @@
 import { fileURLToPath, URL } from 'node:url'
 
-import { defineConfig } from 'vite'
+// defineConfig di vitest/config: estende quello di Vite con la chiave `test`
+import { defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
@@ -22,11 +23,6 @@ export default defineConfig({
     setupFiles: ['src/test/setup.ts'],
     // Cerca i test solo in src/__tests__ — esclude la cartella tests/ del template originale
     include: ['src/__tests__/**/*.test.ts'],
-    // Resolve gli alias @/ come fa Vite in produzione
-    resolve: {
-      alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url)),
-      },
-    },
+    // Gli alias @/ arrivano da `resolve` qui sopra: Vitest usa la stessa config
   },
 })

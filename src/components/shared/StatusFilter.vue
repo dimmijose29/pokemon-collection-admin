@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import type { Component } from 'vue'
 import { Eraser, Logs, ShieldCheck } from 'lucide-vue-next'
 export type StatusFilterValue = 'all' | 'active' | 'deleted'
 
 const model = defineModel<StatusFilterValue>({ default: 'active' })
 
-const options: { value: StatusFilterValue; label: string; component?: any }[] = [
+const options: { value: StatusFilterValue; label: string; component?: Component }[] = [
   { value: 'all', label: 'Tutti', component: Logs },
   { value: 'active', label: 'Attivi', component: ShieldCheck },
   { value: 'deleted', label: 'Eliminati', component: Eraser },

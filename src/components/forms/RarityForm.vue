@@ -2,7 +2,7 @@
 import type { Rarity } from '@/types/rarity'
 import ErrorAlert from '@/components/utils/ErrorAlert.vue'
 
-const props = defineProps<{
+defineProps<{
   rarity?: Rarity | null
   variant?: 'create' | 'edit'
   errors?: string[]

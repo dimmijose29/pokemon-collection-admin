@@ -13,7 +13,7 @@ const router = useRouter()
 const setId = computed(() => Number(route.params.id))
 
 const { data: set } = useQuery({
-  queryKey: ['sets', setId.value],
+  queryKey: ['sets', setId],
   queryFn: () => Sets.getById(setId.value),
   staleTime: Infinity,
 })

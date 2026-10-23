@@ -113,7 +113,7 @@ const sortedArtists = computed(() => {
         <td>
           <ActionColumn
             :actions="artist.deleted_at ? ['restore'] : ['edit', 'delete']"
-            @edit="modalStore.open(artist as Record<string, unknown>)"
+            @edit="modalStore.open(artist)"
             @delete="remove(artist.id)"
             @restore="restore(artist.id)"
           />

@@ -39,7 +39,7 @@ function buildChart() {
   if (chart) { chart.destroy(); chart = null }
 
   const d = items()
-  const { text, textFaint, bg } = getChartColors()
+  const { text, bg } = getChartColors()
 
   chart = new Chart(canvasRef.value, {
     type: 'doughnut',
@@ -71,12 +71,13 @@ function buildChart() {
             usePointStyle: false,
             generateLabels: (chart) => {
               const dataset = chart.data.datasets[0]
+              if (!dataset) return []
               const labels = chart.data.labels as string[]
               const values = dataset.data as number[]
               const colors = dataset.backgroundColor as string[]
               const total = values.reduce((a, b) => a + b, 0)
               return labels.map((label, i) => ({
-                text: `${label}  ${total > 0 ? ((values[i] / total) * 100).toFixed(1) : 0}%`,
+                text: `${label}  ${total > 0 ? (((values[i] ?? 0) / total) * 100).toFixed(1) : 0}%`,
                 fillStyle: colors[i],
                 hidden: false,
                 index: i,

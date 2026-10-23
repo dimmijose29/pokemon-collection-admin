@@ -68,7 +68,8 @@ async function handleSubmit(data: Record<string, unknown>) {
       <template v-else>
         <h2 class="text-2xl font-heading text-center mb-2">Nuova password</h2>
         <p class="text-sm text-base-content/60 text-center mb-6">
-          Scegli una nuova password per <strong>{{ email }}</strong>.
+          Scegli una nuova password per <strong>{{ email }}</strong
+          >.
         </p>
 
         <ErrorAlert :errors="allErrors" />

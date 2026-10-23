@@ -4,23 +4,28 @@ import TCGdex from '@tcgdex/sdk'
 const tcgdex = new TCGdex('it')
 
 const pokemonImageUrl = ref<string | null>('')
-const randomCard = ref<any>(null)
+// L'API restituisce anche `pricing`, che i tipi dell'SDK non dichiarano
+type RandomCard = Awaited<ReturnType<typeof tcgdex.random.card>> & {
+  pricing?: { cardmarket?: { trend?: number | null } | null }
+}
+const randomCard = ref<RandomCard | null>(null)
 
-const getImageUrl = async () => {
+// Si cerca una carta con immagine e prezzo, con un limite per non ciclare all'infinito
+const MAX_ATTEMPTS = 5
+
+const getImageUrl = async (attempt = 1): Promise<void> => {
   if (localStorage.getItem('@tcgdex-cache/https://api.tcgdex.net/v2/it/random/card'))
     localStorage.removeItem('@tcgdex-cache/https://api.tcgdex.net/v2/it/random/card')
-  randomCard.value = await tcgdex.random.card()
-  if (
-    randomCard.value.getImageURL('high', 'png') == 'undefined/high.png' ||
-    randomCard.value.pricing.cardmarket === null
-  ) {
+  const card = (await tcgdex.random.card().catch(() => null)) as RandomCard | null
+  if (!card) return
+  randomCard.value = card
+  if (card.getImageURL('high', 'png') == 'undefined/high.png' || !card.pricing?.cardmarket) {
     if (localStorage.getItem('@tcgdex-cache/https://api.tcgdex.net/v2/it/random/card'))
       localStorage.removeItem('@tcgdex-cache/https://api.tcgdex.net/v2/it/random/card')
-    getImageUrl()
+    if (attempt < MAX_ATTEMPTS) await getImageUrl(attempt + 1)
     return
   }
-  pokemonImageUrl.value = randomCard.value.getImageURL('high', 'png')
-  return true
+  pokemonImageUrl.value = card.getImageURL('high', 'png')
 }
 
 onBeforeMount(async () => {
@@ -154,7 +159,7 @@ onBeforeMount(async () => {
                   <div class="list-col-grow">
                     <span class="text-lg block mt-1" v-if="randomCard?.pricing?.cardmarket">
                       {{
-                        randomCard?.pricing.cardmarket?.trend
+                        randomCard?.pricing?.cardmarket?.trend
                           ? '€ ' + randomCard.pricing.cardmarket.trend.toFixed(2)
                           : 'N/A'
                       }}

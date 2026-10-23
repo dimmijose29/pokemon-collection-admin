@@ -5,6 +5,7 @@ declare module 'vue-router' {
     title?: string
     icon?: Component
     requiresAuth?: boolean
+    requiresAdmin?: boolean
     requiresGuest?: boolean
   }
 }

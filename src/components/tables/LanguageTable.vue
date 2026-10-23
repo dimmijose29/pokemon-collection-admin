@@ -42,7 +42,7 @@ const languages = computed(() => {
   }
 
   return filterBySearch(filtered, search.value, {
-    excludeKeys: ['updated_at', 'deleted_at'],
+    excludeKeys: ['deleted_at'],
     transformers: {
       created_at: (v) => formatDate(v as string),
     },
@@ -122,7 +122,7 @@ const sortedLanguages = computed(() => {
         <td>
           <ActionColumn
             :actions="language.deleted_at ? ['restore'] : ['edit', 'delete']"
-            @edit="modalStore.open(language as Record<string, unknown>)"
+            @edit="modalStore.open(language)"
             @delete="remove(language.id)"
             @restore="restore(language.id)"
           />
