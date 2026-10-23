@@ -46,6 +46,22 @@ describe('ArtistForm', () => {
     expect(emitted().submit![0]).toEqual([{ name: 'Ken Sugimori' }])
   })
 
+  it('passare su un campo vuoto senza scrivere non mostra errori', async () => {
+    render(ArtistForm)
+    await userEvent.click(screen.getByLabelText('Nome'))
+    await userEvent.tab()
+
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
+
+  it("cancellare il nome e uscire dal campo mostra subito l'errore", async () => {
+    render(ArtistForm, { props: { artist, variant: 'edit' } })
+    await userEvent.clear(screen.getByLabelText('Nome'))
+    await userEvent.tab()
+
+    expect(await screen.findByText('Il nome è obbligatorio')).toBeTruthy()
+  })
+
   it("blocca l'invio e mostra il messaggio se il nome è vuoto", async () => {
     const { emitted } = render(ArtistForm)
     await submitForm()

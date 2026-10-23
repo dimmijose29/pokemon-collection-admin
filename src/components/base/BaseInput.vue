@@ -4,7 +4,9 @@ import { useField } from 'vee-validate'
 import BaseField from './BaseField.vue'
 
 // Campo di testo collegato al form VeeValidate tramite `name` (chiave dello schema Zod).
-// Valida al blur; dopo il primo errore rivalida mentre si scrive.
+// Come la modalità "dirty" di FormKit: all'uscita valida solo un campo modificato
+// (passare su un campo vuoto non mostra errori), dopo il primo errore rivalida mentre si
+// scrive; l'invio del form valida comunque tutti i campi.
 const props = withDefaults(
   defineProps<{
     name: string
@@ -24,7 +26,7 @@ const emit = defineEmits<{ keydown: [event: KeyboardEvent] }>()
 
 const inputId = useId()
 
-const { value, errorMessage, handleBlur, handleChange } = useField<string | number>(
+const { value, errorMessage, meta, handleBlur, handleChange } = useField<string | number>(
   () => props.name,
   undefined,
   { validateOnValueUpdate: false },
@@ -63,7 +65,7 @@ function onInput(e: Event) {
         :aria-invalid="hasError"
         :aria-label="label ? undefined : placeholder"
         @input="onInput"
-        @blur="handleBlur($event, true)"
+        @blur="handleBlur($event, meta.dirty)"
         @keydown="emit('keydown', $event)"
       />
       <slot name="suffix" />

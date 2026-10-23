@@ -1,11 +1,12 @@
 /* Campi dei form (BaseInput, BaseSelect, OtpInput): classi .app-field-control e .field-message.
    Solo variabili daisyUI, niente colori fissi. */
 
+/* Focus nel colore secondary, come i campi FormKit di prima */
 .app-field-control:focus-within,
 .app-field-control:focus {
-  border-color: var(--color-primary);
+  border-color: var(--color-secondary);
   outline: none;
-  box-shadow: 0 0 0 2px color-mix(in oklch, var(--color-primary) 40%, transparent);
+  box-shadow: 0 0 0 1px var(--color-secondary);
 }
 
 .app-field-control.is-invalid {
@@ -14,7 +15,8 @@
 
 .app-field-control.is-invalid:focus-within,
 .app-field-control.is-invalid:focus {
-  box-shadow: 0 0 0 2px color-mix(in oklch, var(--color-error) 40%, transparent);
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 1px var(--color-error);
 }
 
 .field-message {
