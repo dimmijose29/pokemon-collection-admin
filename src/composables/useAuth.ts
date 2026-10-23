@@ -95,8 +95,5 @@ export function useAuth() {
     logout,
     loading,
     error,
-    isAuthenticated: store.isAuthenticated,
-    isAdmin: store.isAdmin,
-    user: store.user,
   }
 }

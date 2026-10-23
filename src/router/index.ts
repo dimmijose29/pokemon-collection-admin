@@ -1,4 +1,9 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  type RouteLocationNormalized,
+  type RouteLocationRaw,
+} from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { me } from '@/api/auth'
 import { authRoutes } from './routes/auth'
@@ -14,7 +19,11 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach(async (to, _from, next) => {
+/**
+ * Guardia di autenticazione: restituisce dove reindirizzare, oppure true per proseguire.
+ * Separata dal router per poterla testare senza navigazioni reali.
+ */
+export async function authGuard(to: RouteLocationNormalized): Promise<RouteLocationRaw | true> {
   const auth = useAuthStore()
   document.title = to.meta.title ? `${to.meta.title} - Pokemon Collection` : 'Pokemon Collection'
 
@@ -28,18 +37,20 @@ router.beforeEach(async (to, _from, next) => {
   }
 
   if ((to.meta.requiresAuth || to.meta.requiresAdmin) && !auth.isAuthenticated) {
-    return next({ name: 'login' })
+    return { name: 'login' }
   }
 
   if (to.meta.requiresAdmin && !auth.isAdmin) {
-    return next({ name: 'unauthorized' })
+    return { name: 'unauthorized' }
   }
 
   if (to.meta.requiresGuest && auth.isAuthenticated) {
-    return next({ name: 'dashboard' })
+    return { name: 'dashboard' }
   }
 
-  next()
-})
+  return true
+}
+
+router.beforeEach(authGuard)
 
 export default router

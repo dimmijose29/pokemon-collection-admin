@@ -87,6 +87,8 @@ function setInputRef(el: Element | null, index: number) {
       type="text"
       inputmode="numeric"
       maxlength="1"
+      autocomplete="one-time-code"
+      :aria-label="`Cifra ${index + 1} di ${len}`"
       :value="digits[index]"
       @input="onInput(index, $event)"
       @keydown="onKeydown(index, $event)"
